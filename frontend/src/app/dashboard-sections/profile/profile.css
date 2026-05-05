@@ -1,0 +1,43 @@
+.custom-input {
+  padding: 12px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.custom-input:focus {
+  background-color: #151515 !important;
+  border-color: #0dcaf0 !important;
+  box-shadow: 0 0 10px rgba(13, 202, 240, 0.2);
+  color: white;
+}
+
+.profile-image-upload img {
+  background-color: #1a1a1a;
+  padding: 5px;
+}
+
+.btn-info {
+  background: linear-gradient(45deg, #0dcaf0, #0aa3c2);
+  border: none;
+  color: #000 !important;
+}
+
+.btn-info:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(13, 202, 240, 0.4);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

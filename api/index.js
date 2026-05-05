@@ -1,0 +1,57 @@
+import express, { json } from "express";
+import cors  from "cors"
+import { configDotenv } from "dotenv";
+import path from "path";
+import cookieParser from "cookie-parser";
+import { errorHandler, notFoundHandler } from "../backend/Middlewares/notFoundHandler.middleware.js";
+import contactRoute from "../backend/Routes/contact.route.js";
+import portfolioRoutes from "../backend/Routes/user.data.route.js";
+import authRoutes from "../backend/Routes/auth.route.js";
+import dashboardRoutes from "../backend/Routes/dashBoardAuth.route.js";
+import { sequelize } from "../backend/Config/db.config.js";
+
+configDotenv();
+const app = express();
+
+const allowedHosts=["http://localhost:4200"]
+// Middlewares
+app.use(json());
+app.use(cookieParser());
+app.use(cors({
+    origin:allowedHosts,
+}))
+app.use("/uploads", express.static(path.join(process.cwd(), "backend", "uploads")));
+
+// Routes
+app.use("/portfolio", portfolioRoutes);
+app.use("/contact", contactRoute);
+app.use("/auth", authRoutes);
+app.use("/portfolio/edit", dashboardRoutes);
+
+// temporary route
+app.get("/", (req, res) => {
+    res.status(200).json({ message: "API is running smoothly with PostgreSQL" });
+});
+
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+
+
+const startApp = async () => {
+    try {
+        
+        await sequelize.authenticate(); 
+        
+        app.listen(PORT, () => {
+            console.log(`Server is running on http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error('Unable to start the server:', error);
+    }
+};
+
+startApp();
+
+export default app;

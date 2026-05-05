@@ -1,0 +1,12 @@
+# Backend
+node_modules/
+frontend/node_modules/
+.env
+uploads
+offline_database.sqlite
+
+
+
+# Editor 
+.agents/
+skills-lock.json

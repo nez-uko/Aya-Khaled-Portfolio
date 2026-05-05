@@ -1,0 +1,27 @@
+footer {
+  background-color: #080808 !important;
+}
+
+h5.fw-bold.text-info{
+  font-family: cursive;
+}
+.hover-info:hover {
+  color: var(--main-color) !important;
+  transition: 0.3s;
+}
+
+
+footer .text-info.fw-bold {
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+footer .text-info.fw-bold:hover {
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(13, 202, 240, 0.4);
+}
+
+
+.social-links i {
+  font-size: 1.2rem;
+}

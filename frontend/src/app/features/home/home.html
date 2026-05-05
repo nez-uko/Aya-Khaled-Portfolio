@@ -1,0 +1,394 @@
+@if (loading) {
+  <div class="skeleton-page-wrapper">
+    <section class="hero-section text-white py-5">
+      <div class="container py-5">
+        <div class="row align-items-center">
+          <div class="col-lg-6 order-lg-2 mb-4 text-center">
+            <div class="skeleton skeleton-circle mx-auto"></div>
+          </div>
+          <div class="col-lg-6 text-lg-start text-center">
+            <div class="skeleton skeleton-title mb-3 w-75"></div>
+            <div class="skeleton skeleton-text mb-4 w-100"></div>
+            <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+              <div class="skeleton skeleton-btn"></div>
+              <div class="skeleton skeleton-btn"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="container py-5 text-center">
+      <div class="skeleton skeleton-text w-25 mb-4 mx-auto"></div>
+      <div class="row g-4">
+        @for (item of [1, 2, 3]; track $index) {
+          <div class="col-md-4">
+            <div class="skeleton w-100" style="height: 250px; border-radius: 15px"></div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+@if (!loading) {
+  <div class="main-content">
+    <section class="hero-section text-white py-5 justify-content-center">
+      <div class="container py-3">
+        <div class="row align-items-center">
+          <div class="col-lg-6 order-lg-2 mb-4 mb-lg-0 text-center">
+            <img
+              [src]="user?.profile || './IMG-20251117-WA0000.jpg'"
+              [alt]="user?.name"
+              class="profile-img shadow-lg"
+            />
+          </div>
+          <div class="col-lg-6 text-lg-start text-center">
+            <h1 class="display-4 mb-2">
+              <p>Hello, I'm</p>
+
+              <span class="text-info fw-bold name">{{ user?.name || 'Aya Khaild' }}</span>
+            </h1>
+            <p class="lead mb-4 opacity-75">{{ user?.bio }}</p>
+            <div
+              class="d-flex gap-3 justify-content-center flew-column flex-lg-row justify-content-lg-start"
+            >
+              <a routerLink="/projects" class="btn btn-primary btn-lg px-4 fw-bold text-dark"
+                >View Projects</a
+              >
+              <a [href]="user?.cv" target="_blank" class="btn btn-outline-light btn-lg px-4"
+                >Download CV</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section py-5 bg-dark text-white border-top border-secondary" id="about">
+      <div class="container py-4">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-5 d-none d-lg-block">
+            <div class="about-img-wrapper position-relative text-center">
+              <img
+                [src]="user?.profile || '/IMG-20251117-WA0000.jpg'"
+                [alt]="user?.name"
+                class="img-fluid rounded-4 shadow-lg border border-secondary about-img"
+              />
+              <div class="about-decorator"></div>
+            </div>
+          </div>
+
+          <div class="col-lg-7 col-12">
+            <div class="about-content p-2">
+              <h2 class="fw-bold display-5 mb-4 text-start text-lg-start">
+                My Journey
+                <span class="text-info fw-normal fs-4 d-block mt-1 text-primary">
+                  Bridging Data and Decisions</span
+                >
+              </h2>
+
+              <div class="about-text-wrapper fs-6 lh-lg opacity-75">
+                @for (paragraph of splitDescription(user?.description); track $index) {
+                  <p class="mb-3">{{ paragraph }}.</p>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-dark">
+      <div class="container text-white text-center">
+        <h2 class="mb-5 fw-bold">Professional <span class="text-info">Skills</span></h2>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+          @for (skill of user?.skills; track $index) {
+            <span class="badge skill-badge fs-6 px-4 py-2">{{ skill }}</span>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-black text-white">
+      <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Recent <span class="text-info">Projects</span></h2>
+        <div class="row g-4">
+          @for (project of projects | slice: 0 : 3; track $index) {
+            <div class="col-md-4">
+              <div
+                class="card h-100 bg-dark text-white border-secondary shadow-sm"
+                (click)="redirectToDetails(project.id)"
+              >
+                <img
+                  [src]="project?.projectImage"
+                  class="card-img-top"
+                  style="height: 200px; object-fit: cover"
+                />
+                <div class="card-body">
+                  <h5 class="card-title text-info">{{ project?.title }}</h5>
+                  <p class="card-text opacity-75 small">{{ project?.description }}</p>
+                  <div class="project-tags d-flex flex-wrap gap-2 mb-4">
+                    @for (skill of project.usedSkills; track $index) {
+                      <span class="skill-tag">
+                        {{ skill }}
+                      </span>
+                    }
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a
+                      [href]="project?.liveDemo"
+                      target="_blank"
+                      class="btn btn-sm btn-info fw-bold"
+                      >Live Demo</a
+                    >
+                    <a [href]="project?.githubLink" target="_blank" class="btn btn-sm btn-2 fw-bold"
+                      >Code</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center py-2 px-2 my-5">
+          <a href="/projects" class="btn btn-outline-info btn-lg">View All Projects </a>
+        </div>
+      </div>
+    </section>
+
+    @if (experiences.length > 0) {
+      <section class="experience-section py-5 bg-black text-white border-top border-secondary">
+        <div class="container py-4">
+          <h2 class="text-center mb-5 fw-bold">
+            Professional <span class="text-info">Experience</span>
+          </h2>
+
+          <div class="timeline-container position-relative mx-auto" style="max-width: 900px">
+            <div class="timeline-line"></div>
+
+            @for (exp of experiences; track $index) {
+              <div class="timeline-item mb-5 position-relative">
+                <div class="timeline-dot"></div>
+
+                <div
+                  class="experience-card p-4 rounded-4 bg-dark border border-secondary shadow-sm"
+                >
+                  <div
+                    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3"
+                  >
+                    <div>
+                      <h4 class="text-info fw-bold mb-1">{{ exp.title }}</h4>
+                      <p class="mb-0 fw-semibold fs-5">{{ exp.company }}</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <span class="badge date-badge mt-2 mt-md-0 px-3 py-2">
+                        {{ exp.startDate | date }}
+                      </span>
+                      <span class="badge date-badge mt-2 mt-md-0 px-3 py-2">
+                        {{ exp.endDate ? (exp.endDate | date: 'MMM yyyy') : 'present' }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="experience-description">
+                    <ul class="list-unstyled opacity-75">
+                      @for (point of splitDescription(exp.description); track $index) {
+                        <li class="mb-2 d-flex align-items-start">
+                          <i class="bi bi-check2-circle text-info me-2 mt-1"></i>
+                          <span>{{ point }}</span>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center opacity-50">
+                <p>No experiences added yet.</p>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+    }
+
+    <section class="certificates-section py-5 bg-dark text-white border-top border-secondary">
+      <div class="container py-4">
+        <h2 class="text-center mb-5 fw-bold">My <span class="text-info">Certifications</span></h2>
+
+        <div class="row g-4">
+          @for (cert of certificates; track $index) {
+            <div class="col-lg-4 col-md-6">
+              <div class="cert-card h-100 p-4 rounded-4 bg-black border border-secondary shadow-sm">
+                <div class="cert-icon mb-3">
+                  <i class="bi bi-award fs-1 d-block mb-3"></i>
+                </div>
+                <h5 class="fw-bold mb-2">{{ cert.title }}</h5>
+                <p class="small">{{ cert.description }}</p>
+                <p class="small mb-3">
+                  Issued by: <span class="text-white opacity-75">{{ cert.issuer }}</span>
+                </p>
+
+                <div class="d-flex justify-content-between align-items-center mt-auto">
+                  <span class="badge date-badge px-3 py-2">{{
+                    cert.issueDate | date: 'MMM yyyy'
+                  }}</span>
+                  <a
+                    [href]=""
+                    target="_blank"
+                    class="btn btn-sm btn-outline-info rounded-pill px-3"
+                  >
+                    View Credential
+                  </a>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="text-center w-100 opacity-50 py-5">
+              <i class="bi bi-award fs-1 d-block mb-3"></i>
+              <p>Certificates are being loaded...</p>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-black text-white border-top border-secondary" id="contact">
+      <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Get In <span class="text-info">Touch</span></h2>
+        <div class="row g-5">
+          <div class="col-lg-5">
+            <div class="contact-info-card p-4 rounded-4 bg-dark border border-secondary h-100">
+              <h4 class="mb-4 text-info fw-bold">Contact Info</h4>
+
+              <div class="d-flex align-items-center mb-4">
+                <div class="icon-box me-3"><i class="bi bi-envelope-at"></i></div>
+                <div>
+                  <a [href]="'mailto:' + user?.email" class="text-decoration-none">
+                    <p class="mb-0 fw-semibold text-white">{{ user?.email }}</p>
+                  </a>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-4">
+                <div class="icon-box me-3"><i class="bi bi-phone"></i></div>
+                <div>
+                  <a [href]="'tel:' + user?.phoneNumber" class="text-decoration-none">
+                    <p class="mb-0 fw-semibold text-white">{{ user?.phoneNumber }}</p>
+                  </a>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-4">
+                <div class="icon-box me-3"><i class="bi bi-geo-alt"></i></div>
+                <div>
+                  <p class="mb-0 fw-semibold">
+                    {{ user?.governorate }} , {{ user?.city }} {{ user?.street || '' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <p class="text-secondary small fw-bold text-uppercase mb-3">
+                  Professional Profiles
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                  <a [href]="user?.linkedIn" class="icon-box text-decoration-none" title="LinkedIn"
+                    ><i class="bi bi-linkedin"></i
+                  ></a>
+                  <a [href]="user?.gitHub" class="icon-box text-decoration-none" title="GitHub"
+                    ><i class="bi bi-github"></i
+                  ></a>
+
+                  <div class="d-flex flex-wrap gap-2">
+                    @for (platform of getAvailablePlatforms(); track platform.name) {
+                      <a
+                        [href]="platform.url"
+                        class="icon-box text-decoration-none"
+                        [title]="platform.name"
+                        target="_blank"
+                      >
+                        @if (platform.display.type === 'fa-icon') {
+                          <i [class]="platform.display.value"></i>
+                        } @else if (platform.display.type === 'svg') {
+                          <img
+                            [src]="platform.display.value"
+                            [alt]="platform.name"
+                            style="width: 30px; height: 30px"
+                          />
+                        } @else {
+                          <span
+                            [style.backgroundColor]="platform.display.bgColor"
+                            class="initials-icon"
+                          >
+                            {{ platform.display.value }}
+                          </span>
+                        }
+                      </a>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-7">
+            @if (contactMessage) {
+              <div
+                class="alert"
+                [class.alert-success]="contactSuccess"
+                [class.alert-danger]="!contactSuccess"
+              >
+                {{ contactMessage }}
+              </div>
+            }
+            <form (ngSubmit)="sendMessage()" class="row g-3">
+              <div class="col-md-6">
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  [(ngModel)]="contactForm.name"
+                  name="name"
+                  placeholder="Name"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <input
+                  type="email"
+                  class="form-control custom-input"
+                  [(ngModel)]="contactForm.email"
+                  name="email"
+                  placeholder="Email"
+                  required
+                />
+              </div>
+              <div class="col-12">
+                <textarea
+                  class="form-control custom-input"
+                  rows="5"
+                  [(ngModel)]="contactForm.message"
+                  name="message"
+                  placeholder="Your Message"
+                  required
+                ></textarea>
+              </div>
+              <div class="col-12">
+                <button
+                  type="submit"
+                  class="btn btn-info w-100 py-3 fw-bold text-dark"
+                  [disabled]="sending"
+                >
+                  @if (sending) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                  }
+                  {{ sending ? 'Sending...' : 'Send Message' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+}

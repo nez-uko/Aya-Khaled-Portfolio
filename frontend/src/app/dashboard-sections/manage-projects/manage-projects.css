@@ -1,0 +1,40 @@
+.bg-black {
+  background-color: #080808 !important;
+}
+
+.table {
+  --bs-table-bg: transparent;
+}
+
+.form-control:focus {
+  background-color: #000 !important;
+  border-color: #0dcaf0 !important;
+  box-shadow: 0 0 10px rgba(13, 202, 240, 0.2);
+  color: white;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 202, 240, 0.03);
+}
+
+.btn-info {
+  background: linear-gradient(45deg, #0dcaf0, #0aa3c2);
+  border: none;
+  color: #000 !important;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

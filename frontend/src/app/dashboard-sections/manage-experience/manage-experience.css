@@ -1,0 +1,59 @@
+
+
+.custom-input {
+  border-radius: 10px;
+  padding: 10px 15px;
+  transition: 0.3s;
+}
+
+.custom-input:focus {
+  background-color: #121212 !important;
+  border-color: #0dcaf0 !important;
+  box-shadow: 0 0 10px rgba(13, 202, 240, 0.2);
+  color: white;
+}
+
+.table {
+  --bs-table-bg: transparent;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 202, 240, 0.03);
+}
+
+.btn-info {
+  background: linear-gradient(45deg, #0dcaf0, #0aa3c2);
+  border: none;
+  color: #000 !important;
+}
+
+.form-check-input:checked {
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease;
+}
+.animate-slide-down {
+  animation: slideDown 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

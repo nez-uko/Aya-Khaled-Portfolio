@@ -1,0 +1,210 @@
+<div class="manage-edu-container animate-fade-in">
+  <div class="card bg-black border-secondary shadow-lg rounded-4 overflow-hidden">
+    <div
+      class="card-header bg-dark border-bottom border-secondary p-4 d-flex justify-content-between align-items-center"
+    >
+      <h4 class="mb-0 fw-bold text-white">
+        <i class="bi bi-award me-2 text-info"></i>Education &
+        <span class="text-info">Certificates</span>
+      </h4>
+      <button
+        class="btn btn-info btn-sm rounded-pill px-3 fw-bold shadow"
+        (click)="newCertificate()"
+      >
+        <i class="bi bi-plus-lg me-1"></i> Add Certificate
+      </button>
+    </div>
+
+    <div class="card-body p-4">
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-info"></div>
+        </div>
+      }
+
+      @if (!loading) {
+        @if (message) {
+          <div
+            class="alert alert-info bg-info-subtle border-info text-dark fw-bold mb-4 animate-slide-down"
+          >
+            <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+          </div>
+        }
+
+        @if (editing) {
+          <div
+            class="edit-section mb-5 p-4 bg-dark border border-info border-opacity-25 rounded-4 animate-slide-down"
+          >
+            <h5 class="text-info fw-bold mb-4">
+              <i
+                class="bi"
+                [class.bi-patch-check-fill]="editing.id"
+                [class.bi-plus-circle-fill]="!editing.id"
+              ></i>
+              {{ editing.id ? 'Edit Certificate' : 'New Certificate' }}
+            </h5>
+
+            <form class="row g-3" #addCert="ngForm">
+              <div class="col-md-6">
+                <label class="form-label text-white  small">Certificate Title</label>
+                <input
+                  type="text"
+                  class="form-control bg-black border-secondary text-white custom-input"
+                  [(ngModel)]="editing.title"
+                  name="title"
+                  required
+                  #titleVar="ngModel"
+                  placeholder="e.g. Full Stack Web Development"
+                />
+                @if (titleVar.invalid && titleVar.touched) {
+                  <small class="text-danger mt-1">Title is required.</small>
+                }
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-white  small">Issuer (Organization)</label>
+                <input
+                  type="text"
+                  class="form-control bg-black border-secondary text-white custom-input"
+                  [(ngModel)]="editing.issuer"
+                  name="issuer"
+                  required
+                  #issuerVar="ngModel"
+                  placeholder="e.g. Udacity, Coursera, ITI"
+                />
+                @if (issuerVar.invalid && issuerVar.touched) {
+                  <small class="text-danger mt-1">Issuer is required.</small>
+                }
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-white small">Certificate Image</label>
+                <div class="input-group">
+                  <input
+                    type="file"
+                    class="form-control bg-black border-secondary text-white"
+                    (change)="onFileSelected($event)"
+                    accept="image/*"
+                    [required]="!editing.id"
+                    name="certImage"
+                    [(ngModel)]="editing.certificateImage"
+                    #certImage="ngModel"
+                  />
+
+                </div>
+                @if (
+                    !editing.id &&
+                    certImage.invalid &&
+                    (certImage.touched || addCert.submitted)
+                  ) {
+                    <p class="text-danger small mt-1">Project image is required</p>
+                  }
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-white  small">Issue Date</label>
+                <input
+                  type="date"
+                  class="form-control bg-black border-secondary text-white custom-input"
+                  [ngModel]="editing.issueDate | date: 'yyyy-MM-dd'"
+                  (ngModelChange)="editing.issueDate = $event"
+                  name="issueDate"
+                />
+              </div>
+
+              <div class="col-12">
+                <label class="form-label text-white small">Description</label>
+                <textarea
+                  class="form-control bg-black border-secondary text-white custom-input"
+                  rows="2"
+                  [(ngModel)]="editing.description"
+                  name="description"
+                  placeholder="What did you learn?"
+                ></textarea>
+              </div>
+
+              <div class="col-12 d-flex gap-2 mt-4">
+                <button
+                  type="button"
+                  class="btn btn-info rounded-pill px-4 fw-bold shadow"
+                  (click)="save()"
+                  [disabled]="addCert.invalid || saving"
+                >
+                  @if (saving) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                  }
+                  Save Certificate
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary rounded-pill px-4"
+                  (click)="cancelEdit()"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <div class="table-responsive mt-2">
+          <table class="table table-dark table-hover align-middle">
+            <thead class="text-info small text-uppercase">
+              <tr>
+                <th class="border-secondary pb-3">Logo</th>
+                <th class="border-secondary pb-3">Certificate & Issuer</th>
+                <th class="border-secondary pb-3">Date</th>
+                <th class="border-secondary pb-3 text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cert of certificates; track cert.id) {
+                <tr>
+                  <td class="border-secondary py-3">
+                    <img
+                      [src]="cert.certificateImage"
+                      class="rounded-2 border border-secondary"
+                      width="45"
+                      height="45"
+                      style="object-fit: cover"
+                    />
+                  </td>
+                  <td class="border-secondary py-3">
+                    <div class="fw-bold text-white">{{ cert.title }}</div>
+                    <div class="small">{{ cert.issuer }}</div>
+                  </td>
+                  <td class="border-secondary py-3 small">
+                    <span class="text-info opacity-75">{{
+                      cert.issueDate | date: 'MMMM yyyy'
+                    }}</span>
+                  </td>
+                  <td class="border-secondary py-3 text-end">
+                    <button
+                      class="btn btn-outline-warning btn-sm rounded-pill me-2 shadow-sm"
+                      (click)="edit(cert)"
+                    >
+                      <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button
+                      class="btn btn-outline-danger btn-sm rounded-pill shadow-sm"
+                      (click)="delete(cert.id!)"
+                    >
+                      <i class="bi bi-trash3-fill"></i>
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="text-center py-5 opacity-50">
+                    <i class="bi bi-mortarboard fs-2 d-block mb-2"></i>
+                    Your education list is empty.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>

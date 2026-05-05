@@ -1,0 +1,35 @@
+.project-details {
+  background-color: #080808 !important;
+}
+
+.detail-img-wrapper img {
+  max-height: 500px;
+  object-fit: contain;
+  background-color: #121212;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: #6c757d;
+}
+
+.project-body p {
+  text-align: justify;
+}
+
+.btn-dark:hover {
+  background-color: #1a1d20;
+  border-color: var(--main-color) !important;
+  color: var(--main-color);
+}
+
+@media (max-width: 991px) {
+  .project-details {
+    text-align: center;
+  }
+  .h-line {
+    margin: 0 auto;
+  }
+  .project-actions {
+    justify-content: center;
+  }
+}

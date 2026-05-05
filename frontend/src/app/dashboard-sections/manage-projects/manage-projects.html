@@ -1,0 +1,244 @@
+<div class="manage-projects-container animate-fade-in">
+  <div class="card bg-black border-secondary shadow-lg rounded-4 overflow-hidden">
+    <div
+      class="card-header bg-dark border-bottom border-secondary p-4 d-flex justify-content-between align-items-center"
+    >
+      <h4 class="mb-0 fw-bold text-white">
+        <i class="bi bi-kanban me-2 text-info"></i>Manage <span class="text-info">Projects</span>
+      </h4>
+      <button class="btn btn-info btn-sm rounded-pill px-3 fw-bold shadow" (click)="newProject()">
+        <i class="bi bi-plus-lg me-1"></i> Add Project
+      </button>
+    </div>
+
+    <div class="card-body p-4">
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-info"></div>
+        </div>
+      }
+
+      @if (editing) {
+        <div
+          class="edit-section mb-5 p-4 bg-dark border border-info border-opacity-25 rounded-4 animate-slide-down"
+        >
+          <h5 class="text-info fw-bold mb-4">
+            <i
+              class="bi"
+              [class.bi-pencil-square]="editing.id"
+              [class.bi-plus-circle]="!editing.id"
+            ></i>
+            {{ editing.id ? 'Edit Project' : 'Create New Project' }}
+          </h5>
+
+          <form class="row g-3" #addProject="ngForm">
+            <div class="col-md-6">
+              <label class="form-label text-white small">Project Title</label>
+              <input
+                type="text"
+                class="form-control bg-black border-secondary text-white"
+                [(ngModel)]="editing.title"
+                name="title"
+                placeholder="Enter title"
+                required
+                minlength="3"
+                maxlength="50"
+                #projectName="ngModel"
+              />
+              @if (projectName.invalid && (projectName.touched || addProject.submitted)) {
+                <div class="text-danger small mt-1">
+                  @if (projectName.errors?.['required']) {
+                    <span>Project title is required</span>
+                  }
+                  @if (projectName.errors?.['minlength']) {
+                    <span>Title must be at least 3 characters</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-white small">Project Image</label>
+              <div class="input-group">
+                <input
+                  type="file"
+                  class="form-control bg-black border-secondary text-white"
+                  (change)="onFileSelected($event)"
+                  accept="image/*"
+                  [required]="!editing.id"
+                  name="projectImage"
+                  [(ngModel)]="editing.projectImage"
+                  #projectImg="ngModel"
+                />
+              </div>
+              @if (
+                !editing.id && projectImg.invalid && (projectImg.touched || addProject.submitted)
+              ) {
+                <p class="text-danger small mt-1">Project image is required</p>
+              }
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-white small">Description</label>
+              <textarea
+                class="form-control bg-black border-secondary text-white"
+                [(ngModel)]="editing.description"
+                name="description"
+                placeholder="Short project summary"
+                rows="3"
+                required
+                #projectDesc="ngModel"
+              ></textarea>
+              @if (projectDesc.invalid && (projectDesc.touched || addProject.submitted)) {
+                <p class="text-danger small mt-1">Project description is required</p>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-white small">Live Demo URL</label>
+              <input
+                type="text"
+                class="form-control bg-black border-secondary text-white"
+                [(ngModel)]="editing.liveDemo"
+                name="liveDemo"
+                placeholder="https://..."
+                pattern="https?://.+"
+                #liveUrl="ngModel"
+              />
+              @if (liveUrl.invalid && liveUrl.touched) {
+                <p class="text-danger small mt-1">Please enter a valid URL (http/https)</p>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-white small">GitHub Repository</label>
+              <input
+                type="text"
+                class="form-control bg-black border-secondary text-white"
+                [(ngModel)]="editing.githubLink"
+                name="githubLink"
+                placeholder="https://github.com/..."
+                required
+                pattern="^https?:\/\/(www\.)?github\.com\/[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+(\/)?$"
+                #gitHub="ngModel"
+              />
+              @if (gitHub.invalid && (gitHub.touched || addProject.submitted)) {
+                <div class="text-danger small mt-1">
+                  @if (gitHub.errors?.['required']) {
+                    <span>GitHub link is required</span>
+                  }
+                  @if (gitHub.errors?.['pattern']) {
+                    <span>Invalid GitHub URL</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="col-12 mt-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <label class="form-label text-info small fw-bold mb-0">Skills</label>
+                <button
+                  type="button"
+                  class="btn btn-outline-info btn-sm rounded-pill"
+                  (click)="addSkill()"
+                >
+                  <i class="bi bi-plus-lg me-1"></i> Add
+                </button>
+              </div>
+              <div class="row g-2">
+                @for (skill of this.editing.usedSkills; track $index; let i = $index) {
+                  <div class="col-2">
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control bg-dark border-secondary text-white w-50"
+                        [(ngModel)]="this.editing.usedSkills[i]"
+                        [name]="'skill' + i"
+                        placeholder="skill"
+                        required
+                      />
+                      <button type="button" class="btn btn-outline-danger" (click)="removeSkill(i)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="col-12 d-flex gap-2 mt-4">
+              <button
+                type="button"
+                class="btn btn-info rounded-pill px-4 fw-bold"
+                (click)="addProject.valid && save()"
+                [disabled]="saving || addProject.invalid"
+              >
+                @if (saving) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+                {{ editing.id ? 'Update' : 'Save' }} Project
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary rounded-pill px-4"
+                (click)="cancelEdit()"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+
+      @if (!loading) {
+        <div class="table-responsive mt-2">
+          <table class="table table-dark table-hover align-middle">
+            <thead class="text-info small text-uppercase">
+              <tr>
+                <th class="border-secondary pb-3">Preview</th>
+                <th class="border-secondary pb-3">Project Title</th>
+                <th class="border-secondary pb-3 text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (project of projects; track project.id) {
+                <tr>
+                  <td class="border-secondary py-3">
+                    <img
+                      [src]="project.projectImage"
+                      class="rounded-3 border border-secondary"
+                      width="60"
+                      height="45"
+                      style="object-fit: cover"
+                    />
+                  </td>
+                  <td class="border-secondary py-3 fw-semibold">{{ project.title }}</td>
+                  <td class="border-secondary py-3 text-end">
+                    <button
+                      class="btn btn-outline-warning btn-sm rounded-pill me-2"
+                      (click)="edit(project)"
+                    >
+                      <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button
+                      class="btn btn-outline-danger btn-sm rounded-pill"
+                      (click)="delete(project.id)"
+                    >
+                      <i class="bi bi-trash3-fill"></i>
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="text-center py-5 opacity-50">
+                    No projects found. Add your first project!
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>

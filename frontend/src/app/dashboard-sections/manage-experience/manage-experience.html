@@ -1,0 +1,211 @@
+<div class="manage-experience-container animate-fade-in">
+  <div class="card bg-black border-secondary shadow-lg rounded-4 overflow-hidden">
+    <div
+      class="card-header bg-dark border-bottom border-secondary p-4 d-flex justify-content-between align-items-center"
+    >
+      <h4 class="mb-0 fw-bold text-white">
+        <i class="bi bi-briefcase me-2 text-info"></i>Manage
+        <span class="text-info">Experience</span>
+      </h4>
+      <button
+        class="btn btn-info btn-sm rounded-pill px-3 fw-bold shadow"
+        (click)="newExperience()"
+      >
+        <i class="bi bi-plus-lg me-1"></i> Add Experience
+      </button>
+    </div>
+
+    <div class="card-body p-4">
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-info"></div>
+        </div>
+      }
+
+      @if (!loading) {
+        @if (message) {
+          <div
+            class="alert alert-info bg-info-subtle border-info text-dark fw-bold mb-4 animate-slide-down"
+          >
+            <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+          </div>
+        }
+
+        @if (editing) {
+          <div
+            class="edit-section mb-5 p-4 bg-dark border border-info border-opacity-25 rounded-4 animate-slide-down"
+          >
+            <h5 class="text-info fw-bold mb-4">
+              <i
+                class="bi"
+                [class.bi-pencil-square]="editing.id"
+                [class.bi-plus-circle]="!editing.id"
+              ></i>
+              {{ editing.id ? 'Edit Experience' : 'New Experience' }}
+            </h5>
+
+            <form class="row g-3" #expForm="ngForm">
+              <div class="col-md-6">
+                <label class="form-label text-white small">Job Title</label>
+                <input
+                  type="text"
+                  class="form-control bg-black border-secondary text-white custom-input"
+                  [(ngModel)]="editing.title"
+                  name="title"
+                  required
+                  #titleVar="ngModel"
+                  placeholder="Software Engineer"
+                />
+                @if (titleVar.invalid && titleVar.touched) {
+                  <small class="text-danger mt-1">Job title is required.</small>
+                }
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-white small">Company Name</label>
+                <input
+                  type="text"
+                  class="form-control bg-black border-secondary text-white custom-input"
+                  [(ngModel)]="editing.company"
+                  name="company"
+                  required
+                  #companyVar="ngModel"
+                  placeholder="Company Name"
+                />
+                @if (companyVar.invalid && companyVar.touched) {
+                  <small class="text-danger mt-1">Company name is required.</small>
+                }
+              </div>
+
+              <div class="col-12">
+                <label class="form-label text-white small">Job Description</label>
+                <textarea
+                  class="form-control bg-black border-secondary text-white custom-input"
+                  rows="3"
+                  [(ngModel)]="editing.description"
+                  name="description"
+                  placeholder="Main responsibilities and achievements"
+                ></textarea>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label text-white small">Start Date</label>
+                <input
+                  type="date"
+                  class="form-control bg-black border-secondary text-white custom-input"
+                  [ngModel]="editing.startDate | date: 'yyyy-MM-dd'"
+                  (ngModelChange)="editing.startDate = $event"
+                  name="startDate"
+                  required
+                  #startVar="ngModel"
+                />
+                @if (startVar.invalid && startVar.touched) {
+                  <small class="text-danger mt-1">Start date is required.</small>
+                }
+              </div>
+
+              <div class="col-md-4">
+                @if (!editing.currentlyWorking) {
+                  <label class="form-label text-white small">End Date</label>
+                  <input
+                    type="date"
+                    class="form-control bg-black border-secondary text-white custom-input"
+                    [ngModel]="editing.endDate | date: 'yyyy-MM-dd'"
+                    (ngModelChange)="editing.endDate = $event"
+                    name="endDate"
+                    [required]="!editing.currentlyWorking"
+                  />
+                }
+              </div>
+
+              <div class="col-md-4 d-flex align-items-end pb-2">
+                <div class="form-check form-switch mb-2">
+                  <input
+                    type="checkbox"
+                    class="form-check-input bg-dark border-secondary"
+                    [(ngModel)]="editing.currentlyWorking"
+                    name="currentlyWorking"
+                    id="currentlyWorking"
+                  />
+                  <label class="form-check-label text-white small ms-2" for="currentlyWorking"
+                    >Currently Working Here</label
+                  >
+                </div>
+              </div>
+
+              <div class="col-12 d-flex gap-2 mt-4">
+                <button
+                  type="button"
+                  class="btn btn-info rounded-pill px-4 fw-bold shadow"
+                  (click)="save()"
+                  [disabled]="expForm.invalid || saving"
+                >
+                  @if (saving) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                  }
+                  Save Experience
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary rounded-pill px-4"
+                  (click)="cancelEdit()"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <div class="table-responsive mt-2">
+          <table class="table table-dark table-hover align-middle">
+            <thead class="text-info small text-uppercase">
+              <tr>
+                <th class="border-secondary pb-3">Role & Company</th>
+                <th class="border-secondary pb-3">Period</th>
+                <th class="border-secondary pb-3 text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (exp of experiences; track exp.id) {
+                <tr>
+                  <td class="border-secondary py-3">
+                    <div class="fw-bold text-white">{{ exp.title }}</div>
+                    <div class="text-white small">{{ exp.company }}</div>
+                  </td>
+                  <td class="border-secondary py-3 small">
+                    <span class="badge bg-dark border border-secondary text-info fw-normal">
+                      {{ exp.startDate | date: 'yyyy' }} -
+                      {{ exp.currentlyWorking ? 'Present' : (exp.endDate | date: 'yyyy') }}
+                    </span>
+                  </td>
+                  <td class="border-secondary py-3 text-end">
+                    <button
+                      class="btn btn-outline-warning btn-sm rounded-pill me-2 shadow-sm"
+                      (click)="edit(exp)"
+                    >
+                      <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button
+                      class="btn btn-outline-danger btn-sm rounded-pill shadow-sm"
+                      (click)="delete(exp.id!)"
+                    >
+                      <i class="bi bi-trash3-fill"></i>
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="text-center py-5 opacity-50">
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                    No professional experience added yet.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>
