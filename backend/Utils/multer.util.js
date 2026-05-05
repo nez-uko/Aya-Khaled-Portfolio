@@ -35,3 +35,16 @@ export const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter 
 });
+
+
+export const getFullImageUrl = (req, imagePath) => {
+    if (!imagePath) return null;
+    
+    const domain = process.env.NODE_ENV === 'production' 
+        ? `https://${req.get('host')}` 
+        : `${req.protocol}://${req.get('host')}`;
+        
+    const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `${domain}${cleanPath}`;
+};
+

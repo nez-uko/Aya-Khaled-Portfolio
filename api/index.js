@@ -13,13 +13,13 @@ import { sequelize } from "../backend/Config/db.config.js";
 configDotenv();
 const app = express();
 
-const allowedHosts=["http://localhost:4200"]
 // Middlewares
 app.use(json());
 app.use(cookieParser());
 app.use(cors({
-    origin:allowedHosts,
-}))
+    origin: true,
+    credentials: true
+}));
 app.use("/uploads", express.static(path.join(process.cwd(), "backend", "uploads")));
 
 // Routes
@@ -41,12 +41,12 @@ const PORT = process.env.PORT || 5000;
 
 const startApp = async () => {
     try {
-        
         await sequelize.authenticate(); 
-        
-        app.listen(PORT, () => {
-            console.log(`Server is running on http://localhost:${PORT}`);
-        });
+        if (process.env.NODE_ENV !== 'production') {
+            app.listen(PORT, () => {
+                console.log(`Server is running on http://localhost:${PORT}`);
+            });
+        }
     } catch (error) {
         console.error('Unable to start the server:', error);
     }

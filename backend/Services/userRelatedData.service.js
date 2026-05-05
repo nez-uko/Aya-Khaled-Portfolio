@@ -3,6 +3,7 @@ import Certificate from "../Models/certificates.model.js";
 import fs from "fs";
 import path from "path";
 import Project from "../Models/projects.model.js";
+import { getFullImageUrl } from "../Utils/multer.util.js";
 
 // --- Projects Services ---
 
@@ -12,9 +13,7 @@ const getAllProjectsService = async (req) => {
     if(projects)
     {
         projects.map((pro)=>{
-            pro.projectImage = pro.projectImage 
-            ? `${req.protocol}://${req.get('host')}${pro.projectImage.startsWith('/') ? '' : '/'}${pro.projectImage}` 
-            : null;
+            pro.projectImage = getFullImageUrl(req, cert.projectImage);
         })
     }
     return projects || null;
@@ -98,9 +97,7 @@ const getAllCertificatesService = async (req) => {
     if(certificates)
     {
         certificates.map((cert)=>{
-            cert.certificateImage = cert.certificateImage 
-            ? `${req.protocol}://${req.get('host')}${cert.certificateImage.startsWith('/') ? '' : '/'}${cert.certificateImage}` 
-            : null;
+            cert.certificateImage = getFullImageUrl(req, cert.certificateImage);
         })
     }
         console.log(certificates);

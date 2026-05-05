@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  // apiUrl: 'https://your-backend-url.com/api'
+  apiUrl: 'https://aya-khaled-portfolio-gamma.vercel.app'
 };
