@@ -7,7 +7,7 @@ const validateUpdateUserData = (obj) => {
         skills: Joi.string().optional(),
         description: Joi.string().optional(),
         linkedIn:Joi.string().optional(),
-        github:Joi.string().optional(),
+        gitHub:Joi.string().optional(),
         phoneNumber:Joi.string().optional().valid(/^01[0125][0-9]{8}$/),
         city:Joi.string().optional(),
         street:Joi.string().allow("").optional(),
