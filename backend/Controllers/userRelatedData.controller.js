@@ -22,7 +22,6 @@ import {
     updateExperienceService,
     updateCertificateService,
 } from "../Services/userRelatedData.service.js";
-import { where } from "sequelize";
 import Project from "../Models/projects.model.js";
 import Certificate from "../Models/certificates.model.js";
 
@@ -66,9 +65,10 @@ const getOneProject = asyncHandler(async (req, res) => {
     if (!project) {
         return res.status(404).json({ message: "Project Not found" });
     }
-    project.projectImage = project.projectImage
-        ? `${req.protocol}://${req.get("host")}${project.projectImage.startsWith("/") ? "" : "/"}${project.projectImage}`
-        : null;
+
+    if (project.projectImage && project.projectImage.url) {
+        project.projectImage = project.projectImage.url;
+    }
     return res.status(200).json({
         message: "project retrieved successfully",
         project,

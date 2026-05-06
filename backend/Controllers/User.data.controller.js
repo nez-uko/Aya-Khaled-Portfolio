@@ -4,6 +4,8 @@ import path from "path";
 import { getMainDataService, editUserDataService } from "../Services/User.data.service.js";
 import User from "../Models/user.model.js";
 import { validateUpdateUserData } from "../Validators/userData.validate.js";
+import { uploadToCloudinary } from "../Utils/cloudinary.util.js";
+import { v2 as cloudinary } from "cloudinary";
 
 const getMainData = asyncHandler(async (req, res) => {
     const user = await getMainDataService();
@@ -13,12 +15,12 @@ const getMainData = asyncHandler(async (req, res) => {
     }
     
     let userData = user.get({ plain: true });
-        userData.profile = userData.profile 
-        ? `${req.protocol}://${req.get('host')}${userData.profile.startsWith('/') ? '' : '/'}${userData.profile}` 
-        : null;
-        userData.cv = userData.cv 
-            ? `${req.protocol}://${req.get('host')}${userData.cv.startsWith('/') ? '' : '/'}${userData.cv}`
-            : null;        
+    if (userData.profile && userData.profile.url) {
+        userData.profile = userData.profile.url;
+    }
+    if (userData.cv && userData.cv.url) {
+        userData.cv = userData.cv.url;
+    }
     res.status(200).json({
         userData
     });
@@ -46,27 +48,25 @@ const uploadProfileImage = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "User not found in database" });
     }
 
-    
-    if (user.profile) {
+    if (user.profile && user.profile.publicId) {
         try {
-            const fileName = path.basename(user.profile);
-            const oldPath = path.join(process.cwd(), 'backend', 'uploads', fileName);
-            if (fs.existsSync(oldPath)) {
-                fs.unlinkSync(oldPath);
-            }
+            await cloudinary.uploader.destroy(user.profile.publicId);
         } catch (err) {
-            return res.status(500).json("Falied to update profile image")
+            console.log("Failed to delete old profile image:", err);
         }
     }
 
-    const relativePath = `/uploads/${req.file.filename}`;
-    user.profile = relativePath;
+    const result = await uploadToCloudinary(req.file.buffer);
+    user.profile = {
+        url: result.url,
+        publicId: result.publicId
+    };
 
     try {
         await user.save();
-        res.status(200).json({ success: true, profileImage: relativePath });
+        res.status(200).json({ success: true, profileImage: result.url });
     } catch (dbError) {
-        res.status(500).json({ message: "Server saved the file but DB failed", error: dbError.message });
+        res.status(500).json({ message: "Image uploaded but DB failed", error: dbError.message });
     }
 });
 
@@ -77,9 +77,13 @@ export const deleteProfileImage = asyncHandler(async (req, res) => {
     if (!user || !user.profile) {
         return res.status(404).json({ message: "No profile image found" });
     }
-    const imagePath = path.join(process.cwd(),'backend', user.profile);
-    if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+    
+    if (user.profile.publicId) {
+        try {
+            await cloudinary.uploader.destroy(user.profile.publicId);
+        } catch (err) {
+            console.log("Failed to delete from Cloudinary:", err);
+        }
     }
     
     user.profile = null;

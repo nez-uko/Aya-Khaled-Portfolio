@@ -1,5 +1,6 @@
-import { log } from "console";
 import User from "../Models/user.model.js";
+import { uploadToCloudinary } from "../Utils/cloudinary.util.js";
+import { v2 as cloudinary } from "cloudinary";
 
 const getMainDataService = async () => {
     let user = await User.findOne({
@@ -8,45 +9,50 @@ const getMainDataService = async () => {
     return user || null;
 };
 
-const editUserDataService = async (userEmail, updateData, cv ) => {
+const editUserDataService = async (userEmail, updateData, cvFile) => {
     const user = await User.findOne({ where: { email: userEmail } });
     if (!user) return null;
-    if(updateData.skills){
-        updateData.skills=JSON.parse(updateData.skills)
-    }else{
-        updateData.skills=[]
+    
+    if (updateData.skills) {
+        updateData.skills = JSON.parse(updateData.skills);
+    } else {
+        updateData.skills = [];
     }
-    if(updateData.freelancePlatforms){
-        updateData.freelancePlatforms=JSON.parse(updateData.freelancePlatforms)
-    }else{
-        updateData.freelancePlatforms=[]
+    
+    if (updateData.freelancePlatforms) {
+        updateData.freelancePlatforms = JSON.parse(updateData.freelancePlatforms);
+    } else {
+        updateData.freelancePlatforms = [];
     }
-    let relativePath='';
-    if(cv){
-        if (user.cv) {
-        try {
-            const fileName = path.basename(user.cv);
-            const oldPath = path.join(process.cwd(), 'backend', 'uploads', fileName);
-            if (fs.existsSync(oldPath)) {
-                fs.unlinkSync(oldPath);
+    
+    let cvData = user.cv;
+    if (cvFile) {
+        if (user.cv && user.cv.publicId) {
+            try {
+                await cloudinary.uploader.destroy(user.cv.publicId);
+            } catch (err) {
+                console.log("Failed to delete old CV:", err);
             }
-        } catch (err) {            
-            return res.status(500).json("Falied to update Cv")
         }
+        
+        const result = await uploadToCloudinary(cvFile.buffer);
+        cvData = {
+            url: result.url,
+            publicId: result.publicId
+        };
     }
-        relativePath = `/uploads/${cv.filename}`;
-    }
-        user.name=updateData.name || user.name;
-        user.description=updateData.description || user.description;
-        user.linkedIn=updateData.linkedIn || user.linkedIn;
-        user.gitHub=updateData.gitHub || user.gitHub;
-        user.phoneNumber=updateData.phoneNumber || user.phoneNumber;
-        user.city=updateData.city || user.city;
-        user.street=updateData.street || user.street;
-        user.governorate=updateData.governorate || user.governorate;
-        user.skills=updateData.skills || user.skills;
-        user.freelancePlatforms=updateData.freelancePlatforms || user.freelancePlatforms;
-        user.cv=relativePath || user.cv
+    
+    user.name = updateData.name || user.name;
+    user.description = updateData.description || user.description;
+    user.linkedIn = updateData.linkedIn || user.linkedIn;
+    user.gitHub = updateData.gitHub || user.gitHub;
+    user.phoneNumber = updateData.phoneNumber || user.phoneNumber;
+    user.city = updateData.city || user.city;
+    user.street = updateData.street || user.street;
+    user.governorate = updateData.governorate || user.governorate;
+    user.skills = updateData.skills || user.skills;
+    user.freelancePlatforms = updateData.freelancePlatforms || user.freelancePlatforms;
+    user.cv = cvData;
     
     try {
         await user.save();

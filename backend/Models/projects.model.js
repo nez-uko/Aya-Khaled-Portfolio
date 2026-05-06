@@ -13,7 +13,8 @@ const Project = sequelize.define('Project', {
         defaultValue: null 
     },
     projectImage: { 
-        type: DataTypes.STRING, 
+        type: DataTypes.JSONB,
+        allowNull: true,
         defaultValue: null 
     },
     liveDemo: { 

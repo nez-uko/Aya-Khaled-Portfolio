@@ -1,9 +1,11 @@
 # Backend
 node_modules/
-frontend/node_modules/
 .env
 offline_database.sqlite
 
+
+# frontend 
+frontend/node_modules/
 
 
 # Editor 

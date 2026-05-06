@@ -1,17 +1,16 @@
 import { Router } from "express";
-import {  getMainData } from "../Controllers/User.data.controller.js";
+import { getMainData } from "../Controllers/User.data.controller.js";
 import { getAllProjects, getAllExperiences, getAllCertificates, getOneProject } from "../Controllers/userRelatedData.controller.js";
-const router= Router();
-
+const router = Router();
 
 router.get("/", getMainData);
 
-router.get("/projects",getAllProjects);
+router.get("/projects", getAllProjects);
 
-router.get("/experiences",getAllExperiences);
+router.get("/experiences", getAllExperiences);
 
-router.get("/certificates",getAllCertificates);
+router.get("/certificates", getAllCertificates);
 
-router.get("/project/:id",getOneProject);
+router.get("/project/:id", getOneProject);
 
-export default router
+export default router;

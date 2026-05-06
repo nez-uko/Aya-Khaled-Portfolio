@@ -1,39 +1,51 @@
 import Experience from "../Models/Experiences.model.js";
 import Certificate from "../Models/certificates.model.js";
-import fs from "fs";
-import path from "path";
 import Project from "../Models/projects.model.js";
-import { getFullImageUrl } from "../Utils/multer.util.js";
+import { uploadToCloudinary } from "../Utils/cloudinary.util.js";
+import { v2 as cloudinary } from "cloudinary";
 
 // --- Projects Services ---
 
 const getAllProjectsService = async (req) => {
-    const projects= await Project.findAll({ order: [["createdAt", "DESC"]] });
+    const projects = await Project.findAll({ order: [["createdAt", "DESC"]] });
     
-    if(projects)
-    {
-        projects.map((pro)=>{
-            pro.projectImage = getFullImageUrl(req, cert.projectImage);
-        })
+    if (projects) {
+        projects.forEach(project => {
+            if (project.projectImage && project.projectImage.url) {
+                project.projectImage = project.projectImage.url;
+            }
+        });
     }
     return projects || null;
 };
 
 const getOneProjectService = async (id) => {
-    return await Project.findByPk(id);
+    const project = await Project.findByPk(id);
+    if (project && project.projectImage && project.projectImage.url) {
+        project.projectImage = project.projectImage.url;
+    }
+    return project;
 };
 
 const addProjectService = async (data, file) => {
     let project;
-    data.projectImage = `/uploads/${file.filename}`;
-    if(data.usedSkills){
-        data.usedSkills=JSON.parse(data.usedSkills)
-    }else{
-        data.usedSkills=[]
+    
+    if (file) {
+        const result = await uploadToCloudinary(file.buffer);
+        data.projectImage = {
+            url: result.url,
+            publicId: result.publicId
+        };
+    }
+    
+    if (data.usedSkills) {
+        data.usedSkills = JSON.parse(data.usedSkills);
+    } else {
+        data.usedSkills = [];
     }
 
     try {
-        project= await Project.create(data);
+        project = await Project.create(data);
     } catch (error) {
         console.log(error);
         return null;
@@ -46,24 +58,40 @@ const updateProjectService = async (id, data, file) => {
     if (!project) return null;
 
     if (file) {
-        if (project.projectImage) {
-            const oldPath = path.join(process.cwd(),'backend', project.projectImage);
-            if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        if (project.projectImage && project.projectImage.publicId) {
+            try {
+                await cloudinary.uploader.destroy(project.projectImage.publicId);
+            } catch (err) {
+                console.log("Failed to delete old project image:", err);
+            }
         }
-        data.projectImage = `/uploads/${file.filename}`;
+        
+        const result = await uploadToCloudinary(file.buffer);
+        data.projectImage = {
+            url: result.url,
+            publicId: result.publicId
+        };
     }
+    
+    if (data.usedSkills) {
+        data.usedSkills = JSON.parse(data.usedSkills);
+    }
+    
     return await project.update(data);
 };
 
 const deleteProjectService = async (id) => {
     const project = await Project.findByPk(id);
-    if (!project) 
-        return null;
+    if (!project) return null;
     
-    if (project.projectImage) {
-        const imagePath = path.join(process.cwd(),'backend', project.projectImage);
-        if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+    if (project.projectImage && project.projectImage.publicId) {
+        try {
+            await cloudinary.uploader.destroy(project.projectImage.publicId);
+        } catch (err) {
+            console.log("Failed to delete project image from Cloudinary:", err);
+        }
     }
+    
     await project.destroy();
     return true;
 };
@@ -93,25 +121,29 @@ const deleteExperienceService = async (id) => {
 // --- Certificate Services ---
 
 const getAllCertificatesService = async (req) => {
-    const certificates= await Certificate.findAll({ order: [["createdAt", "DESC"]] });
-    if(certificates)
-    {
-        certificates.map((cert)=>{
-            cert.certificateImage = getFullImageUrl(req, cert.certificateImage);
-        })
+    const certificates = await Certificate.findAll({ order: [["createdAt", "DESC"]] });
+    
+    if (certificates) {
+        certificates.forEach(cert => {
+            if (cert.certificateImage && cert.certificateImage.url) {
+                cert.certificateImage = cert.certificateImage.url;
+            }
+        });
     }
-        console.log(certificates);
-
     return certificates || null;
 };
 
 const addCertificateService = async (data, file) => {
     let certificate;
     if (file) {
-        data.certificateImage = `/uploads/${file.filename}`;
+        const result = await uploadToCloudinary(file.buffer);
+        data.certificateImage = {
+            url: result.url,
+            publicId: result.publicId
+        };
     }
     try {
-        certificate= await Certificate.create(data);
+        certificate = await Certificate.create(data);
     } catch (error) {
         return null;
     }
@@ -123,11 +155,19 @@ const updateCertificateService = async (id, data, file) => {
     if (!certificate) return null;
 
     if (file) {
-        if (certificate.certificateImage) {
-            const oldPath = path.join(process.cwd(),'backend', certificate.certificateImage);
-            if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        if (certificate.certificateImage && certificate.certificateImage.publicId) {
+            try {
+                await cloudinary.uploader.destroy(certificate.certificateImage.publicId);
+            } catch (err) {
+                console.log("Failed to delete old certificate image:", err);
+            }
         }
-        data.certificateImage = `/uploads/${file.filename}`;
+        
+        const result = await uploadToCloudinary(file.buffer);
+        data.certificateImage = {
+            url: result.url,
+            publicId: result.publicId
+        };
     }
 
     return await certificate.update(data);
@@ -137,9 +177,12 @@ const deleteCertificateService = async (id) => {
     const certificate = await Certificate.findByPk(id);
     if (!certificate) return null;
 
-    if (certificate.certificateImage) {
-        const imagePath = path.join(process.cwd(),'backend', certificate.certificateImage);
-        if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+    if (certificate.certificateImage && certificate.certificateImage.publicId) {
+        try {
+            await cloudinary.uploader.destroy(certificate.certificateImage.publicId);
+        } catch (err) {
+            console.log("Failed to delete certificate image from Cloudinary:", err);
+        }
     }
 
     return await certificate.destroy();

@@ -12,7 +12,11 @@ const User = sequelize.define(
         role: { type: DataTypes.STRING, defaultValue: "user" },
         bio: { type: DataTypes.STRING, allowNull: true },
         description: { type: DataTypes.TEXT, allowNull: true },
-        profile: { type: DataTypes.STRING, allowNull: true },
+        profile: {
+            type: DataTypes.JSONB,
+            allowNull: true,
+            defaultValue: null
+        },
         linkedIn: { type: DataTypes.STRING, allowNull: false },
         gitHub: { type: DataTypes.STRING, allowNull: false },
         phoneNumber: { type: DataTypes.STRING, allowNull: false },
@@ -36,16 +40,17 @@ const User = sequelize.define(
         freelancePlatforms: {
             type: DataTypes.JSONB,
             allowNull: true,
-            defaultValue: [], 
+            defaultValue: [],
         },
         cv: {
-    type: DataTypes.STRING,
-    allowNull: true
+            type: DataTypes.JSONB,
+            allowNull: true,
+            defaultValue: null
         },
         refreshToken: {
-        type: DataTypes.TEXT,
-        allowNull: true,      
-    }
+            type: DataTypes.TEXT,
+            allowNull: true,
+        }
 
     },
     {
@@ -70,9 +75,9 @@ User.prototype.generateToken = function () {
 
 User.prototype.generateRefreshToken = function () {
     return jwt.sign(
-        { id: this.id }, 
-        process.env.JWT_REFRESH_SECRET_KEY, 
-        { expiresIn: "7d" } 
+        { id: this.id },
+        process.env.JWT_REFRESH_SECRET_KEY,
+        { expiresIn: "7d" }
     );
 };
 export default User;

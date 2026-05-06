@@ -16,8 +16,9 @@ const Certificate = sequelize.define('Certificate', {
         allowNull: true 
     },
     certificateImage: { 
-        type: DataTypes.STRING, 
-        defaultValue: "" 
+        type: DataTypes.JSONB,
+        allowNull: true,
+        defaultValue: null
     },
     issueDate: { 
         type: DataTypes.DATE,

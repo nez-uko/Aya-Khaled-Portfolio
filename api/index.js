@@ -20,7 +20,6 @@ app.use(cors({
     origin: true,
     credentials: true
 }));
-app.use("/uploads", express.static(path.join(process.cwd(), "backend", "uploads")));
 
 // Routes
 app.use("/portfolio", portfolioRoutes);
