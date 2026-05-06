@@ -295,16 +295,7 @@ span.text-info{
   overflow: hidden;
   transition: 0.5s ease;
 }
-.send-btn i {
-  position: absolute;
-  top: 50%;
-  left: -20px;
-  transform: translateY(-50%);
-  transition: left 0.3s ease-in-out;
-}
-.send-btn:hover i {
-  left: 10px;
-}
+
 .send-btn span {
   position: relative;
   z-index: 1;

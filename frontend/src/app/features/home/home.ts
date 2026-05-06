@@ -1,13 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, JsonPipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ApiService } from '../../shared/services/api-service';
 import {
   Certificate,
   ContactForm,
   Experience,
-  FREELANCE_ICONS,
   FreelancePlatform,
   Project,
   User,
@@ -26,6 +25,8 @@ export class HomeComponent implements OnInit {
   constructor(private api: ApiService, private router: Router) {
   }
 
+  @ViewChild('contactFormM') contactFormM!: NgForm;
+
   user?: User | null;
   projects: Project[] = [];
   certificates: Certificate[] = [];
@@ -41,10 +42,12 @@ export class HomeComponent implements OnInit {
   };
   contactMessage = '';
   contactSuccess = false;
-
+  loadingError = false;
+  errorMessage = '';
   async ngOnInit() {
     await this.loadAllData();
   }
+
   getAvailablePlatforms() {
     if (!this.user?.freelancePlatforms) return [];
 
@@ -56,8 +59,11 @@ export class HomeComponent implements OnInit {
       };
     });
   }
+
   async loadAllData() {
     this.loading = true;
+    this.loadingError = false;
+    this.errorMessage = '';
     try {
       const results = await Promise.allSettled([
         this.api.getUser(),
@@ -66,46 +72,58 @@ export class HomeComponent implements OnInit {
         this.api.getExperiences(),
       ]);
 
-
       this.user = results[0].status === "fulfilled" ? results[0].value : null;
       this.projects = results[1].status === "fulfilled" ? results[1].value : [];
-
       this.certificates = results[2].status === "fulfilled" ? results[2].value : [];
       this.experiences = results[3].status === "fulfilled" ? results[3].value : [];
+
+      if (!this.user && this.projects.length === 0 && this.certificates.length === 0 && this.experiences.length === 0) {
+        this.loadingError = true;
+        this.errorMessage = 'Failed to load data. Please refresh the page.';
+      }
     } catch (error) {
-      
+      console.error('Error loading data:', error);
+      this.loadingError = true;
+      this.errorMessage = 'Failed to load data. Please check your connection.';
     } finally {
       this.loading = false;
     }
+
   }
 
   async sendMessage() {
-    this.sending = true;
-    try {
-      await this.api.sendContact(this.contactForm);
-      this.contactSuccess = true;
-      this.contactMessage = 'Message sent successfully!';
-      this.contactForm = { name: '', email: '', message: '' };
-      setTimeout(() => {
-        this.contactMessage = '';
-      }, 1000);
-    } catch (error) {
-      this.contactSuccess = false;
-      this.contactMessage = 'Failed to send message. Please try again.';
-    } finally {
-      this.sending = false;
-      setTimeout(() => this.contactMessage = '', 3000);
-    }
-  }
+  this.sending = true;
+  try {
+    await this.api.sendContact(this.contactForm);
+    this.contactSuccess = true;
+    this.contactMessage = 'Message sent successfully!';
+    this.contactForm = { name: '', email: '', message: '' };
 
-  splitDescription(description: string | undefined): string[] {
-    if (!description) return [];
-    return description
-      .split('.')
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
+    if (this.contactFormM) {
+      this.contactFormM.resetForm();
+    }
+
+    setTimeout(() => {
+      this.contactMessage = '';
+    }, 3000);
+  } catch (error) {
+    this.contactSuccess = false;
+    this.contactMessage = 'Failed to send message. Please try again.';
+    setTimeout(() => this.contactMessage = '', 3000);
+  } finally {
+    this.sending = false;
   }
-  redirectToDetails(projectId: number) {
-    this.router.navigateByUrl(`/projects/${projectId}`)
-  }
+}
+
+splitDescription(description: string | undefined): string[] {
+  if (!description) return [];
+  return description
+    .split('.')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
+redirectToDetails(projectId: number) {
+  this.router.navigateByUrl(`/projects/${projectId}`)
+}
 }
