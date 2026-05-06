@@ -28,8 +28,9 @@ app.use("/auth", authRoutes);
 app.use("/portfolio/edit", dashboardRoutes);
 
 // temporary route
-app.get("/", (req, res) => {
-    res.status(200).json({ message: "API is running smoothly with PostgreSQL" });
+app.get("/", async (req, res) => {
+    await sequelize.authenticate();
+    res.json({ message: "API is running" });
 });
 
 app.use(notFoundHandler);
