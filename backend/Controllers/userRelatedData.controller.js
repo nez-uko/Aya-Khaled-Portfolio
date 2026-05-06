@@ -30,7 +30,10 @@ const getAllProjects = asyncHandler(async (req, res) => {
     const projects = await getAllProjectsService(req);
 
     if (!projects || projects.length === 0)
-        return res.status(404).json({ message: "No Projects Added Yet" });
+        return res.status(200).json({ 
+            message: "No Projects Added Yet",
+            projects : []
+        });
 
     return res.status(200).json({
         message: "All Projects retrieved successfully",
@@ -41,7 +44,10 @@ const getAllProjects = asyncHandler(async (req, res) => {
 const getAllExperiences = asyncHandler(async (req, res) => {
     const experiences = await getAllExperiencesService();
     if (!experiences || experiences.length === 0)
-        return res.status(404).json({ message: "No Experiences Added Yet" });
+        return res.status(200).json({ 
+            message: "No Experiences Added Yet",
+            experiences : []
+        });
     return res.status(200).json({
         message: "All Experiences retrieved successfully",
         experiences,
@@ -51,7 +57,10 @@ const getAllExperiences = asyncHandler(async (req, res) => {
 const getAllCertificates = asyncHandler(async (req, res) => {
     const certificates = await getAllCertificatesService(req);
     if (!certificates || certificates.length === 0)
-        return res.status(404).json({ message: "No Certificates Added Yet" });
+        return res.status(200).json({ 
+            message: "No certificates Added Yet",
+            certificates : []
+        });
     return res.status(200).json({
         message: "All Certificates retrieved successfully",
         certificates,

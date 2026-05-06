@@ -111,7 +111,7 @@ export class ProfileComponent implements OnInit {
     formData.append('name', this.user.name);
     formData.append('bio', this.user.bio || '');
     formData.append('linkedIn',this.user.linkedIn);
-    formData.append('github',this.user.gitHub);
+    formData.append('gitHub',this.user.gitHub);
     formData.append('city',this.user.city);
     formData.append('street',this.user.street|| '');
     formData.append('governorate',this.user.governorate);
