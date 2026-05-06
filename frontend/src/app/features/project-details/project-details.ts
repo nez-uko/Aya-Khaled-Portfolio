@@ -22,14 +22,12 @@ export class ProjectDetailsComponent implements OnInit {
     if (id) {
       await this.loadProject(id);
     }
-    console.log( `this is my project${this.project}`);
   }
 
   async loadProject(id: string) {
     this.loading = true;
     try {
       this.project = await this.api.getProject(id);
-      console.log(this.project);
     } catch (error) {
       console.error('Error loading project:', error);
     } finally {

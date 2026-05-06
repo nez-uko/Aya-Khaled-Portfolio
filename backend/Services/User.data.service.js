@@ -31,7 +31,7 @@ const editUserDataService = async (userEmail, updateData, cvFile) => {
             try {
                 await cloudinary.uploader.destroy(user.cv.publicId);
             } catch (err) {
-                console.log("Failed to delete old CV:", err);
+                return null;
             }
         }
         

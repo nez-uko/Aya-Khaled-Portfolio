@@ -1,8 +1,8 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 :root{
-  --main-color:#005fcc;
-  --secondary: #5a4bcf;
+  --main-color:#3e93e7;
+  --secondary: #7f73ff;
 }
 
 body {
@@ -144,3 +144,6 @@ p.text-danger{
   margin-bottom: 10px ;
 }
 
+span.text-info{
+  color: var(--main-color) !important;
+}

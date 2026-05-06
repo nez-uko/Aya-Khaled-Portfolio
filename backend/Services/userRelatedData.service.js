@@ -47,7 +47,6 @@ const addProjectService = async (data, file) => {
     try {
         project = await Project.create(data);
     } catch (error) {
-        console.log(error);
         return null;
     }
     return project;
@@ -62,7 +61,7 @@ const updateProjectService = async (id, data, file) => {
             try {
                 await cloudinary.uploader.destroy(project.projectImage.publicId);
             } catch (err) {
-                console.log("Failed to delete old project image:", err);
+                return null;
             }
         }
         
@@ -88,7 +87,7 @@ const deleteProjectService = async (id) => {
         try {
             await cloudinary.uploader.destroy(project.projectImage.publicId);
         } catch (err) {
-            console.log("Failed to delete project image from Cloudinary:", err);
+            return null;
         }
     }
     
@@ -159,7 +158,7 @@ const updateCertificateService = async (id, data, file) => {
             try {
                 await cloudinary.uploader.destroy(certificate.certificateImage.publicId);
             } catch (err) {
-                console.log("Failed to delete old certificate image:", err);
+                return null;
             }
         }
         
@@ -181,7 +180,7 @@ const deleteCertificateService = async (id) => {
         try {
             await cloudinary.uploader.destroy(certificate.certificateImage.publicId);
         } catch (err) {
-            console.log("Failed to delete certificate image from Cloudinary:", err);
+            return null;
         }
     }
 

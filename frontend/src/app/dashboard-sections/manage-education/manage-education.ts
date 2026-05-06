@@ -63,10 +63,7 @@ async save() {
     this.loading = true;
     try {
       this.certificates = await this.api.getCertificates();
-      console.log(this.certificates);
-
     } catch (error) {
-      console.error('Error loading certificates:', error);
     } finally {
       this.loading = false;
     }

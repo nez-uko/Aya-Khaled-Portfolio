@@ -30,14 +30,11 @@ export class AuthService {
         this._httpClient.post<LoginResponse>(`${this.baseUrl}/auth/login`, { email, password })
       );
 
-      console.log(response);
-
       localStorage.setItem('token', response.token);
       this.isLoggedIn.set(true);
       this.currentUser.set(response.user);
       return true;
     } catch (error) {
-      console.error('Login failed:', error);
       return false;
     }
   }
@@ -49,7 +46,7 @@ export class AuthService {
       );
       this.currentUser.set(user);
     } catch (error) {
-      console.error('Failed to get profile:', error);
+      
     }
   }
 

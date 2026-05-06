@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken"
 const verifyToken = (req, res, next) => {
-    console.log(req.headers);
     let token = req.headers.authorization;
 
     if (!token || !token.startsWith("Bearer ")) {
@@ -18,9 +17,7 @@ const verifyToken = (req, res, next) => {
 };
 
 
-const restrictToPortfolioOwner = (req, res, next) => {
-    console.log("check", req.user); 
-    
+const restrictToPortfolioOwner = (req, res, next) => {    
     if (req.user && req.user.role === "admin") {
         return next();
     }

@@ -73,7 +73,7 @@ export class HomeComponent implements OnInit {
       this.certificates = results[2].status === "fulfilled" ? results[2].value : [];
       this.experiences = results[3].status === "fulfilled" ? results[3].value : [];
     } catch (error) {
-      console.error('Error loading data:', error);
+      
     } finally {
       this.loading = false;
     }

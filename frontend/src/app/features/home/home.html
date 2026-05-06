@@ -376,15 +376,17 @@
               <div class="col-12">
                 <button
                   type="submit"
-                  class="btn btn-info w-100 py-3 fw-bold text-dark"
+                  class="btn send-btn w-100 py-3 fw-bold text-dark"
                   [disabled]="sending"
                 >
                   @if (sending) {
                     <span class="spinner-border spinner-border-sm me-2"></span>
+                    <i class="fa fa-paper-plane"></i>
                   }
-                  {{ sending ? 'Sending...' : 'Send Message' }}
+                  <span>{{ sending ? 'Sending...' : 'Send Message' }}</span>
                 </button>
               </div>
+
             </form>
           </div>
         </div>

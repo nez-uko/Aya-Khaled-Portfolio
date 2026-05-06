@@ -61,10 +61,8 @@ const forgetPassword = asyncHandler(async (req, res) => {
     if(!req.body.email)
         return res.status(400).json({message:"email is required"})
         const email = req.body.email.trim().toLowerCase();
-        console.log(email);
         
     const user = await User.findOne({ where: { email} });
-    console.log(user.email);
     
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -80,7 +78,6 @@ const forgetPassword = asyncHandler(async (req, res) => {
     });
     res.json({ success: true, token });
 } catch (mailError) {
-    console.log("Nodemailer Error:", mailError); 
     res.status(500).json({ message: "Error sending email", detail: mailError.message });
 }
 });
@@ -89,7 +86,6 @@ const verifyOtp = asyncHandler(async (req, res) => {
     const { token, otp } = req.body;
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        console.log(decoded);
         if (decoded.otp !== otp) {
             return res.status(400).json({ message: "Invalid OTP" });
         }
@@ -104,13 +100,11 @@ const resetPassword = asyncHandler(async (req, res) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        console.log(decoded);
         
         const user = await User.findByPk(decoded.id);
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const salt = await bcrypt.genSalt(10);
-        console.log(salt);
         
         user.password = await bcrypt.hash(password, salt);
         await user.save();

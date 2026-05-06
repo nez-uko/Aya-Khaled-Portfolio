@@ -33,8 +33,6 @@ export class LoginComponent {
     this.loading = true;
     this.error = '';
     try {
-      console.log(this.email);
-
       const success = await this.auth.login(this.email, this.password);
       if (success) {
         this.router.navigate(['/ayaDashboard']);
@@ -53,16 +51,13 @@ async onForget() {
   this.error = '';
   try {
     const res: any = await this.auth.forgetPassword({ email: this.email });
-    console.log(res);
 
     if (res && res.token) {
       this.tempToken = res.token;
       this.mode = 'verify';
-      console.log('OTP sent successfully!');
     }
   } catch (err: any) {
     this.error = err.error?.message || 'Something went wrong';
-    console.error('Error details:', err);
   } finally {
     this.loading = false;
   }

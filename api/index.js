@@ -43,4 +43,6 @@ app.get("/", (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+const PORT = process.env.PORT || 5000;
+
 export default app;

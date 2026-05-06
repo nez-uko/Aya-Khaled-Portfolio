@@ -1,9 +1,6 @@
+/* Projects Page */
 .Projects {
-  background-color: #080808 !important;
-}
-
-.card{
-  cursor: pointer;
+  background-color: var(--darker-bg) !important;
 }
 
 .line-clamp-2 {
@@ -11,4 +8,35 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Project Details */
+.project-details {
+  background-color: var(--darker-bg) !important;
+}
+
+.detail-img-wrapper img {
+  max-height: 500px;
+  object-fit: contain;
+  background-color: var(--card-bg);
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: var(--text-gray);
+}
+
+.project-body p {
+  text-align: justify;
+}
+
+@media (max-width: 991px) {
+  .project-details {
+    text-align: center;
+  }
+  .h-line {
+    margin: 0 auto;
+  }
+  .project-actions {
+    justify-content: center;
+  }
 }

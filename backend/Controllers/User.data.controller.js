@@ -52,7 +52,6 @@ const uploadProfileImage = asyncHandler(async (req, res) => {
         try {
             await cloudinary.uploader.destroy(user.profile.publicId);
         } catch (err) {
-            console.log("Failed to delete old profile image:", err);
         }
     }
 
@@ -82,7 +81,7 @@ export const deleteProfileImage = asyncHandler(async (req, res) => {
         try {
             await cloudinary.uploader.destroy(user.profile.publicId);
         } catch (err) {
-            console.log("Failed to delete from Cloudinary:", err);
+            return res.status(500).json({ message: "Failed to delete profile image from Cloudinary", error: err.message });
         }
     }
     

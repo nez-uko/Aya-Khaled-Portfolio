@@ -37,7 +37,6 @@ export class ManageProjectsComponent implements OnInit {
     formData.append('liveDemo', this.editing.liveDemo);
     formData.append('githubLink', this.editing.githubLink || '');
     formData.append('usedSkills', JSON.stringify(this.editing.usedSkills));
-    console.log(JSON.stringify(this.editing.usedSkills));
 
     if (this.selectedFile) {
       formData.append('projectImage', this.selectedFile);
@@ -76,7 +75,6 @@ export class ManageProjectsComponent implements OnInit {
 
   addSkill() {
     this.editing?.usedSkills.push('');
-    console.log(this.editing?.usedSkills);
   }
   removeSkill(index: number) {
     this.editing?.usedSkills.splice(index, 1);
