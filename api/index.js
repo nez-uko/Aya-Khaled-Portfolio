@@ -21,6 +21,13 @@ app.use(cors({
     credentials: true
 }));
 
+try {
+    await sequelize.authenticate();
+    console.log("Database connected successfully");
+} catch (error) {
+    console.error("Database connection failed:", error);
+}
+
 // Routes
 app.use("/portfolio", portfolioRoutes);
 app.use("/contact", contactRoute);
@@ -28,10 +35,10 @@ app.use("/auth", authRoutes);
 app.use("/portfolio/edit", dashboardRoutes);
 
 // temporary route
-app.get("/", async (req, res) => {
-    await sequelize.authenticate();
-    res.json({ message: "API is running" });
+app.get("/", (req, res) => {
+    res.status(200).json({ message: "API is running smoothly" });
 });
+
 
 app.use(notFoundHandler);
 app.use(errorHandler);

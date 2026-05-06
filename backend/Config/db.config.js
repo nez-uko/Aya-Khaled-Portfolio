@@ -20,7 +20,6 @@ if (process.env.OFFLINE === 'true') {
         dialectOptions: {
             ssl: {
                 require: true,
-                rejectUnauthorized: false
             }
         },
         logging: false
