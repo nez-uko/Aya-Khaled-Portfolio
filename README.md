@@ -35,3 +35,6 @@ This project isn't just a static site; it's a secured web application:
 - **Security:** JSON Web Tokens (JWT), Bcrypt encryption, Cookie-parser.
 
 ---
+## 🔗 Live Deployment
+
+- **Live Link:** [Aya Khaled Portfolio](https://aya-khaled-portfolio-rcmc.vercel.app/)
