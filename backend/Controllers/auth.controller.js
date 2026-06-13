@@ -8,38 +8,43 @@ import User from "../Models/user.model.js";
 
 
 const Login = asyncHandler(async (req, res) => {
-    
     const { error } = validateLogin(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
+    if (error) {
+        console.log("Validation error:", error.details[0].message);
+        return res.status(400).json({ message: error.details[0].message });
+    }
 
-    
-    const user = await User.findOne({ where: { email: req.body.email.trim().toLowerCase() } });
-    if (!user) return res.status(400).json({ message: "Invalid email or password" });
+    const email = req.body.email.trim().toLowerCase();
 
-    
-    const isPasswordMatch = await bcrypt.compare(req.body.password, user.password);    
-    if (!isPasswordMatch) return res.status(400).json({ message: "Invalid email or password" });
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+        return res.status(400).json({ message: "Invalid email or password" });
+    }
+    const isPasswordMatch = await bcrypt.compare(req.body.password, user.password);
 
-    
-    const accessToken = user.generateToken(); 
-    const refreshToken = user.generateRefreshToken(); 
+    if (!isPasswordMatch) {
+        return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const accessToken = user.generateToken();
+    const refreshToken = user.generateRefreshToken();
+
 
     user.refreshToken = refreshToken;
     await user.save();
 
     res.cookie('refreshToken', refreshToken, {
-        httpOnly: true, 
-        secure: true,  
-        sameSite: 'None', 
-        maxAge: 7 * 24 * 60 * 60 * 1000 
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    
     const { password, refreshToken: _, ...userData } = user.toJSON();
     res.status(200).json({
         message: "Login Successful",
         ...userData,
-        token: accessToken 
+        token: accessToken
     });
 });
 
@@ -117,30 +122,34 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 
 const refreshToken = asyncHandler(async (req, res) => {
-    const cookieToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies.refreshToken;  
 
-    if (!cookieToken) {
-        return res.status(401).json({ message: "You are not authenticated!" });
+    if (!refreshToken) {
+        return res.status(401).json({ message: "Refresh token not found" });
     }
 
-    const user = await User.findOne({ where: { refreshToken: cookieToken } });
-    
+    const user = await User.findOne({ where: { refreshToken: refreshToken } });
     if (!user) {
-        return res.status(403).json({ message: "Refresh token is not valid!" });
+        return res.status(403).json({ message: "Invalid refresh token" });
     }
 
-    
-    jwt.verify(cookieToken, process.env.JWT_REFRESH_SECRET_KEY, (err, decoded) => {
-        if (err) {
-            return res.status(403).json({ message: "Token is expired or invalid!" });
-        }
-
+    try {
+        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET_KEY);
         const newAccessToken = user.generateToken();
-
-        res.status(200).json({
-            token: newAccessToken
-        });
-    });
+        res.status(200).json({ token: newAccessToken });
+    } catch (err) {
+        return res.status(403).json({ message: "Refresh token expired or invalid" });
+    }
 });
 
-export { Login, forgetPassword, verifyOtp, resetPassword , refreshToken };
+
+const logout = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken) {
+        await User.update({ refreshToken: null }, { where: { refreshToken } });
+    }
+    res.clearCookie('refreshToken', { httpOnly: true, secure: false, sameSite: 'Lax' });
+    res.status(200).json({ message: "Logged out successfully" });
+});
+
+export { Login, forgetPassword, verifyOtp, resetPassword , refreshToken , logout};

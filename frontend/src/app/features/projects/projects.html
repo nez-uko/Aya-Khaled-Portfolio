@@ -8,28 +8,52 @@
     </div>
 
     <div class="row g-4">
-        @for (project of projects; track $index) {
-        <div class="col-md-4" >
-          <div class="card h-100 bg-dark text-white border-secondary shadow-sm" (click)="redirectToDetails(project.id)">
-            <img [src]="project?.projectImage" class="card-img-top" style="height: 200px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title text-info">{{ project?.title }}</h5>
-              <p class="card-text opacity-75 small">{{ project?.description }}</p>
-              <div class="project-tags d-flex flex-wrap gap2 mb-4">
-                @for (skill of project.usedSkills; track skill) {
-                    <span class="skill-tag">
-                          {{skill}}
-                    </span>
-                }
+      @for (project of projects; track $index) {
+      <div class="col-md-4">
+        <div class="card h-100 bg-dark text-white border-secondary shadow-sm" (click)="redirectToDetails(project.id)">
+          @if (project.projectImages && project.projectImages.length > 1) {
+          <div id="carouselAll{{project.id}}" class="carousel slide" data-bs-ride="carousel"
+            (click)="$event.stopPropagation()">
+            <div class="carousel-inner">
+              @for (img of project.projectImages; track img.publicId; let first = $first) {
+              <div class="carousel-item" [class.active]="first">
+                <img [src]="img.url" class="d-block w-100" style="height: 200px; object-fit: cover"
+                  [alt]="project.title">
               </div>
-              <div class=" d-flex gap-2 ">
-                <a [href]="project?.liveDemo" target="_blank" class="btn btn-sm btn-info fw-bold">Live Demo</a>
-                <a [href]="project?.githubLink" target="_blank" class="btn btn-sm btn-2 fw-bold">Code</a>
-              </div>
+              }
+            </div>
+            <button class="carousel-control-prev" type="button" [attr.data-bs-target]="'#carouselAll' + project.id"
+              data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" [attr.data-bs-target]="'#carouselAll' + project.id"
+              data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+          } @else {
+          <img
+            [src]="(project.projectImages && project.projectImages.length > 0) ? project.projectImages[0].url : './IMG-20251117-WA0000.jpg'"
+            class="card-img-top" style="height: 200px; object-fit: cover" [alt]="project.title">
+          }
+          <div class="card-body">
+            <h5 class="card-title text-info">{{ project?.title }}</h5>
+            <p class="card-text opacity-75 small">{{ project?.description }}</p>
+            <div class="project-tags d-flex flex-wrap gap-2 mb-4">
+              @for (skill of project.usedSkills; track skill) {
+              <span class="skill-tag">{{ skill }}</span>
+              }
+            </div>
+            <div class="d-flex gap-2">
+              <a [href]="project?.liveDemo" target="_blank" class="btn btn-sm btn-info fw-bold">Live Demo</a>
+              <a [href]="project?.githubLink" target="_blank" class="btn btn-sm btn-2 fw-bold">Code</a>
             </div>
           </div>
         </div>
-        }
       </div>
+      }
+    </div>
   </div>
 </section>

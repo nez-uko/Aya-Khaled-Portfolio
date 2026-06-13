@@ -48,14 +48,13 @@
         <div class="col-lg-6 text-lg-start text-center">
           <h1 class="display-4 mb-2">
             <p>Hello, I'm</p>
-
             <span class="text-info fw-bold name"
               >{{ user?.name || 'Aya Khaild' }}</span
             >
           </h1>
           <p class="lead mb-4 opacity-75">{{ user?.bio }}</p>
           <div
-            class="d-flex gap-3 justify-content-center flew-column flex-lg-row justify-content-lg-start"
+            class="d-flex gap-3 justify-content-center flex-row flex-lg-row justify-content-lg-start"
           >
             <a
               routerLink="/projects"
@@ -95,15 +94,15 @@
           <div class="about-content p-2">
             <h2 class="fw-bold display-5 mb-4 text-start text-lg-start">
               My Journey
-              <span class="text-info fw-normal fs-4 d-block mt-1 text-primary">
-                Bridging Data and Decisions</span
+              <span class="text-info fw-normal fs-4 d-block mt-1 text-primary"
+                >Bridging Data and Decisions</span
               >
             </h2>
 
             <div class="about-text-wrapper fs-6 lh-lg opacity-75">
               @for (paragraph of splitDescription(user?.description); track
               $index) {
-              <p class="mb-3">{{ paragraph }}.</p>
+              <p class="mb-3">{{ paragraph }}</p>
               }
             </div>
           </div>
@@ -131,53 +130,55 @@
         Recent <span class="text-info">Projects</span>
       </h2>
       <div class="row g-4">
-        @for (project of projects | slice: 0 : 3; track $index) {
-        <div class="col-md-4">
-          <div
-            class="card h-100 bg-dark text-white border-secondary shadow-sm"
-            (click)="redirectToDetails(project.id)"
-          >
-            <img
-              [src]="project?.projectImage"
-              class="card-img-top"
-              style="height: 200px; object-fit: cover"
-            />
-            <div class="card-body">
-              <h5 class="card-title text-info">{{ project?.title }}</h5>
-              <p class="card-text opacity-75 small">
-                {{ project?.description }}
-              </p>
-              <div class="project-tags d-flex flex-wrap gap-2 mb-4">
-                @for (skill of project.usedSkills; track $index) {
-                <span class="skill-tag"> {{ skill }} </span>
-                }
+  @for (project of projects | slice: 0 : 3; track $index) {
+  <div class="col-md-4">
+    <div class="card h-100 bg-dark text-white border-secondary shadow-sm" (click)="redirectToDetails(project.id)">
+      @if (project.projectImages && project.projectImages.length > 1) {
+        <div id="carouselRecent{{project.id}}" class="carousel slide" data-bs-ride="carousel" (click)="$event.stopPropagation()">
+          <div class="carousel-inner">
+            @for (img of project.projectImages; track img.publicId; let first = $first) {
+              <div class="carousel-item" [class.active]="first">
+                <img [src]="img.url" class="d-block w-100" style="height: 200px; object-fit: cover" [alt]="project.title">
               </div>
-              <div class="d-flex gap-2">
-                <a
-                  [href]="project?.liveDemo"
-                  target="_blank"
-                  class="btn btn-sm btn-info fw-bold"
-                  >Live Demo</a
-                >
-                <a
-                  [href]="project?.githubLink"
-                  target="_blank"
-                  class="btn btn-sm btn-2 fw-bold"
-                  >Code</a
-                >
-              </div>
-            </div>
+            }
           </div>
+          <button class="carousel-control-prev" type="button" [attr.data-bs-target]="'#carouselRecent' + project.id" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" [attr.data-bs-target]="'#carouselRecent' + project.id" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
         </div>
-        }
+      } @else {
+        <img [src]="(project.projectImages && project.projectImages.length > 0) ? project.projectImages[0].url : './IMG-20251117-WA0000.jpg'"
+            class="card-img-top" style="height: 200px; object-fit: cover" [alt]="project.title">
+      }
+      <div class="card-body">
+        <h5 class="card-title text-info">{{ project?.title }}</h5>
+        <p class="card-text opacity-75 small">{{ project?.description }}</p>
+        <div class="project-tags d-flex flex-wrap gap-2 mb-4">
+          @for (skill of project.usedSkills; track $index) {
+            <span class="skill-tag">{{ skill }}</span>
+          }
+        </div>
+        <div class="d-flex gap-2">
+          <a [href]="project?.liveDemo" target="_blank" class="btn btn-sm btn-info fw-bold">Live Demo</a>
+          <a [href]="project?.githubLink" target="_blank" class="btn btn-sm btn-2 fw-bold">Code</a>
+        </div>
       </div>
+    </div>
+  </div>
+  }
+</div>
 
       <div
         class="d-flex justify-content-center align-items-center py-2 px-2 my-5"
       >
         <a href="/projects" class="btn btn-outline-info btn-lg"
-          >View All Projects
-        </a>
+          >View All Projects</a
+        >
       </div>
     </div>
   </section>
@@ -212,9 +213,9 @@
                 <p class="mb-0 fw-semibold fs-5">{{ exp.company }}</p>
               </div>
               <div class="d-flex gap-2">
-                <span class="badge date-badge mt-2 mt-md-0 px-3 py-2">
-                  {{ exp.startDate | date }}
-                </span>
+                <span class="badge date-badge mt-2 mt-md-0 px-3 py-2"
+                  >{{ exp.startDate | date }}</span
+                >
                 <span class="badge date-badge mt-2 mt-md-0 px-3 py-2">
                   {{ exp.endDate ? (exp.endDate | date: 'MMM yyyy') : 'present'
                   }}
@@ -276,11 +277,11 @@
                 >{{ cert.issueDate | date: 'MMM yyyy' }}</span
               >
               <a
-                [href]=""
+                [href]="cert.certificateImage.url"
                 target="_blank"
                 class="btn btn-sm btn-outline-info rounded-pill px-3"
               >
-                View Credential
+                View Certificate
               </a>
             </div>
           </div>
@@ -385,9 +386,8 @@
                     <span
                       [style.backgroundColor]="platform.display.bgColor"
                       class="initials-icon p-1"
+                      >{{ platform.display.value }}</span
                     >
-                      {{ platform.display.value }}
-                    </span>
                     }
                   </a>
                   }
@@ -396,6 +396,7 @@
             </div>
           </div>
         </div>
+
         <div class="col-lg-7">
           @if (contactMessage) {
           <div
@@ -406,7 +407,11 @@
             {{ contactMessage }}
           </div>
           }
-          <form (ngSubmit)="sendMessage()" class="row g-3" #contactFormM="ngForm">
+          <form
+            (ngSubmit)="sendMessage()"
+            class="row g-3"
+            #contactFormM="ngForm"
+          >
             <div class="col-md-6">
               <input
                 type="text"
@@ -423,12 +428,11 @@
               {
               <small class="text-danger d-block mt-1">
                 @if (nameInput.errors?.['required']) {
-                <span>Name is required</span>
-                } @if (nameInput.errors?.['minlength']) {
-                <span>Name must be at least 2 characters</span>
-                } @if (nameInput.errors?.['maxlength']) {
-                <span>Name cannot exceed 50 characters</span>
-                }
+                <span>Name is required</span> } @if
+                (nameInput.errors?.['minlength']) {
+                <span>Name must be at least 2 characters</span> } @if
+                (nameInput.errors?.['maxlength']) {
+                <span>Name cannot exceed 50 characters</span> }
               </small>
               }
             </div>
@@ -448,10 +452,9 @@
               emailInput.touched)) {
               <small class="text-danger d-block mt-1">
                 @if (emailInput.errors?.['required']) {
-                <span>Email is required</span>
-                } @if (emailInput.errors?.['email']) {
-                <span>Please enter a valid email address</span>
-                }
+                <span>Email is required</span> } @if
+                (emailInput.errors?.['email']) {
+                <span>Please enter a valid email address</span> }
               </small>
               }
             </div>
@@ -472,12 +475,11 @@
               messageInput.touched)) {
               <small class="text-danger d-block mt-1">
                 @if (messageInput.errors?.['required']) {
-                <span>Message is required</span>
-                } @if (messageInput.errors?.['minlength']) {
-                <span>Message must be at least 10 characters</span>
-                } @if (messageInput.errors?.['maxlength']) {
-                <span>Message cannot exceed 1000 characters</span>
-                }
+                <span>Message is required</span> } @if
+                (messageInput.errors?.['minlength']) {
+                <span>Message must be at least 10 characters</span> } @if
+                (messageInput.errors?.['maxlength']) {
+                <span>Message cannot exceed 1000 characters</span> }
               </small>
               }
             </div>
@@ -489,8 +491,7 @@
                 [disabled]="sending || contactFormM.invalid"
               >
                 @if (sending) {
-                <span class="spinner-border spinner-border-sm me-2"></span>
-                }
+                <span class="spinner-border spinner-border-sm me-2"></span> }
                 <span>{{ sending ? 'Sending...' : 'Send Message' }}</span>
               </button>
             </div>

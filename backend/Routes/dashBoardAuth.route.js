@@ -14,10 +14,10 @@ router.delete("/experience/:id", verifyToken, restrictToPortfolioOwner, deleteEx
 router.put("/", verifyToken, restrictToPortfolioOwner, upload.single("cv"), updateUserProfile);
 router.post("/profile-image", verifyToken, restrictToPortfolioOwner, upload.single("profileImage"), uploadProfileImage);
 router.post("/certificate", verifyToken, restrictToPortfolioOwner, upload.single("certificateImage"), addCertificate);
-router.post("/project", verifyToken, restrictToPortfolioOwner, upload.single("projectImage"), addProject);
+router.post("/project", verifyToken, restrictToPortfolioOwner, upload.array("projectImages",5), addProject);
 router.post("/experience", verifyToken, restrictToPortfolioOwner, upload.none(), addExperience);
 
-router.put("/project/:id", verifyToken, restrictToPortfolioOwner, upload.single("projectImage"), updateProject);
+router.put("/project/:id", verifyToken, restrictToPortfolioOwner, upload.array("projectImages",5), updateProject);
 router.put("/experience/:id", verifyToken, restrictToPortfolioOwner, upload.none(), updateExperience);
 router.put("/certificate/:id", verifyToken, restrictToPortfolioOwner, upload.single("certificateImage"), updateCertificate);
 

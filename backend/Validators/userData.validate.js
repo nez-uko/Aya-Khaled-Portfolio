@@ -57,6 +57,7 @@ const validateUpdateProjectData = (obj) => {
         liveDemo: Joi.string().optional().allow(""),
         githubLink: Joi.string().optional().allow(""),
         usedSkills:Joi.string().optional(),
+        remainingImages: Joi.string().optional().allow("")
     });
     return schema.validate(obj);
 };

@@ -2,7 +2,10 @@ export interface FreelancePlatform {
   name: string;
   link: string;
 }
-
+export interface Image {
+  url: string;
+  publicId: string;
+}
 
 export interface User {
   _id?: string;
@@ -26,7 +29,7 @@ export interface Project {
   id: number;
   title: string;
   description: string;
-  projectImage: string;
+  projectImages: Image[];
   liveDemo: string;
   githubLink?: string;
   usedSkills:string[];
@@ -37,7 +40,7 @@ export interface Certificate {
   title: string;
   issuer: string;
   description: string;
-  certificateImage: string;
+  certificateImage: Image;
   issueDate: Date;
 }
 

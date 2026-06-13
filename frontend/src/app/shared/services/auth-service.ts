@@ -12,7 +12,7 @@ export class AuthService {
   isLoggedIn = signal<boolean>(false);
   currentUser = signal<User | null>(null);
 
-  constructor(private _httpClient:HttpClient,private router:Router) {
+  constructor(private _httpClient: HttpClient, private router: Router) {
     this.checkToken();
   }
 
@@ -46,30 +46,34 @@ export class AuthService {
       );
       this.currentUser.set(user);
     } catch (error) {
-      
+
     }
   }
 
-  logout(): void {
+  async forgetPassword(emailForm: Partial<ForgetPassword>): Promise<any> {
+    return await firstValueFrom(this._httpClient.post(`${this.baseUrl}/auth/forget-password`, emailForm));
+  }
+
+  async verifyOtp(otpForm: Partial<VerifyOTP>): Promise<any> {
+    return await firstValueFrom(this._httpClient.post(`${this.baseUrl}/auth/verfiy-otp`, otpForm));
+  }
+  async resetPassword(passwordForm: Partial<ResetPassword>): Promise<any> {
+    return await firstValueFrom(this._httpClient.post(`${this.baseUrl}/auth/reset-password`, passwordForm));
+  }
+  async refreshToken() {
+    return await firstValueFrom(this._httpClient.post(`${this.baseUrl}/auth/refresh-token`, {}, {
+      withCredentials: true
+    }));
+  }
+  async logout(): Promise<void> {
+    try {
+      await firstValueFrom(this._httpClient.post(`${this.baseUrl}/auth/logout`, {}, { withCredentials: true }));
+    } catch (error) {
+
+    }
     localStorage.removeItem('token');
     this.isLoggedIn.set(false);
     this.currentUser.set(null);
     this.router.navigateByUrl('/login');
   }
-
-    async forgetPassword(emailForm:Partial<ForgetPassword>):Promise<any>{
-      return await firstValueFrom(this._httpClient.post(`${this.baseUrl}/auth/forget-password`,emailForm));
-  }
-
-  async verifyOtp(otpForm:Partial<VerifyOTP>):Promise<any>{
-      return await firstValueFrom(this._httpClient.post(`${this.baseUrl}/auth/verfiy-otp`,otpForm));
-  }
-  async resetPassword(passwordForm:Partial<ResetPassword>):Promise<any>{
-      return await firstValueFrom(this._httpClient.post(`${this.baseUrl}/auth/forget-password`,passwordForm));
-  }
-  async refreshToken() {
-  return await firstValueFrom(this._httpClient.post(`${this.baseUrl}/auth/refresh-token`, {}, {
-    withCredentials: true
-  }));
-}
 }

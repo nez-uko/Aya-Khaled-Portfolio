@@ -10,32 +10,37 @@ const getAllProjectsService = async (req) => {
     const projects = await Project.findAll({ order: [["createdAt", "DESC"]] });
     
     if (projects) {
-        projects.forEach(project => {
-            if (project.projectImage && project.projectImage.url) {
-                project.projectImage = project.projectImage.url;
-            }
-        });
+        return projects.map(project => project.toJSON());
     }
-    return projects || null;
+    return null;
 };
 
 const getOneProjectService = async (id) => {
     const project = await Project.findByPk(id);
-    if (project && project.projectImage && project.projectImage.url) {
-        project.projectImage = project.projectImage.url;
+    if (project) {
+        return project.toJSON(); 
     }
-    return project;
+    return null;
 };
 
-const addProjectService = async (data, file) => {
+const addProjectService = async (data, files) => {
     let project;
     
-    if (file) {
-        const result = await uploadToCloudinary(file.buffer);
-        data.projectImage = {
-            url: result.url,
-            publicId: result.publicId
-        };
+    if (files && files.length > 0) {
+        try {
+            const uploadPromises = files.map(file => uploadToCloudinary(file.buffer));
+            const uploadResults = await Promise.all(uploadPromises);
+            
+            data.projectImages = uploadResults.map(result => ({
+                url: result.url,
+                publicId: result.publicId 
+            }));
+        } catch (uploadError) {
+            console.error("Cloudinary Upload Error:", uploadError);
+            return null; 
+        }
+    } else {
+        data.projectImages = []; 
     }
     
     if (data.usedSkills) {
@@ -52,25 +57,50 @@ const addProjectService = async (data, file) => {
     return project;
 };
 
-const updateProjectService = async (id, data, file) => {
+const updateProjectService = async (id, data, files) => {
     const project = await Project.findByPk(id);
     if (!project) return null;
 
-    if (file) {
-        if (project.projectImage && project.projectImage.publicId) {
-            try {
-                await cloudinary.uploader.destroy(project.projectImage.publicId);
-            } catch (err) {
-                return null;
-            }
-        }
-        
-        const result = await uploadToCloudinary(file.buffer);
-        data.projectImage = {
-            url: result.url,
-            publicId: result.publicId
-        };
+
+    let finalImages = [];
+
+    if (data.remainingImages) {
+        finalImages = typeof data.remainingImages === 'string' 
+            ? JSON.parse(data.remainingImages) 
+            : data.remainingImages;
+    } else {
+        finalImages = [];
     }
+
+    const deletedImages = project.projectImages.filter(oldImg => 
+        !finalImages.some(remImg => remImg.publicId === oldImg.publicId)
+    );
+
+    if (deletedImages.length > 0) {
+        const deletePromises = deletedImages.map(img => 
+            cloudinary.v2.uploader.destroy(img.publicId).catch(e => console.log("Cloudinary destroy error:", e))
+        );
+        await Promise.all(deletePromises); 
+    }
+
+    if (files && files.length > 0) {
+        try {
+            const uploadPromises = files.map(file => uploadToCloudinary(file.buffer));
+            const uploadResults = await Promise.all(uploadPromises);
+            
+            const newImages = uploadResults.map(result => ({
+                url: result.url,
+                publicId: result.publicId
+            }));
+
+            finalImages = [...finalImages, ...newImages];
+        } catch (uploadError) {
+            console.error("Cloudinary Upload Error during update:", uploadError);
+            return null;
+        }
+    }
+
+    data.projectImages = finalImages;
     
     if (data.usedSkills) {
         data.usedSkills = JSON.parse(data.usedSkills);
@@ -83,11 +113,17 @@ const deleteProjectService = async (id) => {
     const project = await Project.findByPk(id);
     if (!project) return null;
     
-    if (project.projectImage && project.projectImage.publicId) {
+    if (project.projectImages && project.projectImages.length > 0) {
         try {
-            await cloudinary.uploader.destroy(project.projectImage.publicId);
+            const deletePromises = project.projectImages.map(img => {
+                if (img.publicId) {
+                    return cloudinary.v2.uploader.destroy(img.publicId);
+                }
+            });
+            
+            await Promise.all(deletePromises);
         } catch (err) {
-            return null;
+            console.error("Cloudinary Delete Error during project deletion:", err);
         }
     }
     

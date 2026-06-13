@@ -117,10 +117,12 @@ export class HomeComponent implements OnInit {
 
 splitDescription(description: string | undefined): string[] {
   if (!description) return [];
+
   return description
     .split('.')
     .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+    .filter((s) => s.length > 0)
+    .map((s) => s + '.');
 }
 
 redirectToDetails(projectId: number) {

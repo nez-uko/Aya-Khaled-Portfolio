@@ -75,7 +75,7 @@ async save() {
       title: '',
       issuer: '',
       description: '',
-      certificateImage: '',
+      certificateImage:{ url: '', publicId: '' },
       issueDate: new Date()
     };
   }

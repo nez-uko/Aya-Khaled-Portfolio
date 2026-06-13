@@ -12,10 +12,17 @@ const Project = sequelize.define('Project', {
         type: DataTypes.TEXT, 
         defaultValue: null 
     },
-    projectImage: { 
+    projectImages: {
         type: DataTypes.JSONB,
-        allowNull: true,
-        defaultValue: null 
+        allowNull: false,
+        defaultValue: [],
+        validate: {
+            isArray(value) {
+                if (!Array.isArray(value)) {
+                    throw new Error('Project images must be an array of objects');
+                }
+            }
+        }
     },
     liveDemo: { 
         type: DataTypes.STRING, 

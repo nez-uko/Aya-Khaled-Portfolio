@@ -80,4 +80,9 @@ User.prototype.generateRefreshToken = function () {
         { expiresIn: "7d" }
     );
 };
+
+User.prototype.comparePassword = async function(plainPassword) {
+    return bcrypt.compare(plainPassword, this.password);
+};
+
 export default User;

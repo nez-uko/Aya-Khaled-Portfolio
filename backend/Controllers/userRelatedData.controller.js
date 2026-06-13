@@ -71,16 +71,13 @@ const getAllCertificates = asyncHandler(async (req, res) => {
 const getOneProject = asyncHandler(async (req, res) => {
     const projectId = req.params.id;
     const project = await getOneProjectService(projectId);
-    if (!project) {
+        if (!project) {
         return res.status(404).json({ message: "Project Not found" });
     }
 
-    if (project.projectImage && project.projectImage.url) {
-        project.projectImage = project.projectImage.url;
-    }
     return res.status(200).json({
         message: "project retrieved successfully",
-        project,
+        project, 
     });
 });
 
@@ -146,9 +143,9 @@ const addProject = asyncHandler(async (req, res) => {
 
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    if (!req.file) {
+    if (!req.files || req.files.length==0) {
         return res.status(400).json({
-            message: "Project Image is required",
+            message: "Project Images are required",
         });
     }
 
@@ -168,7 +165,7 @@ const addProject = asyncHandler(async (req, res) => {
     if (project)
         return res.status(400).json({ message: "this project is already exist" });
 
-    const newProject = await addProjectService(req.body, req.file);
+    const newProject = await addProjectService(req.body, req.files);
 
     if (!newProject)
         return res.status(500).json({ message: "Failed to add project" });
@@ -201,7 +198,7 @@ const updateProject = asyncHandler(async (req, res) => {
     const updatedProject = await updateProjectService(
         req.params.id,
         req.body,
-        req.file,
+        req.files,
     );
     if (!updatedProject)
         return res.status(500).json({ message: "Failed to update project" });

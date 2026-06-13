@@ -17,7 +17,7 @@ const app = express();
 app.use(json());
 app.use(cookieParser());
 app.use(cors({
-    origin: true,
+    origin: 'http://localhost:4200',
     credentials: true
 }));
 
@@ -43,6 +43,9 @@ app.get("/", (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+
 const PORT = process.env.PORT || 5000;
 
 export default app;
+
+

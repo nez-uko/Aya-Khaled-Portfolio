@@ -12,8 +12,6 @@ import { AuthService } from '../../shared/services/auth-service';
   styleUrls: ['./login.css']
 })
 export class LoginComponent {
-
-
   mode: 'login' | 'forget' | 'verify' | 'reset' = 'login';
   email = '';
   password = '';

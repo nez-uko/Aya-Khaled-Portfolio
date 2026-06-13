@@ -1,8 +1,6 @@
 <div class="manage-projects-container animate-fade-in">
   <div class="card bg-black border-secondary shadow-lg rounded-4 overflow-hidden">
-    <div
-      class="card-header bg-dark border-bottom border-secondary p-4 d-flex justify-content-between align-items-center"
-    >
+    <div class="card-header bg-dark border-bottom border-secondary p-4 d-flex justify-content-between align-items-center">
       <h4 class="mb-0 fw-bold text-white">
         <i class="bi bi-kanban me-2 text-info"></i>Manage <span class="text-info">Projects</span>
       </h4>
@@ -19,15 +17,9 @@
       }
 
       @if (editing) {
-        <div
-          class="edit-section mb-5 p-4 bg-dark border border-info border-opacity-25 rounded-4 animate-slide-down"
-        >
+        <div class="edit-section mb-5 p-4 bg-dark border border-info border-opacity-25 rounded-4 animate-slide-down">
           <h5 class="text-info fw-bold mb-4">
-            <i
-              class="bi"
-              [class.bi-pencil-square]="editing.id"
-              [class.bi-plus-circle]="!editing.id"
-            ></i>
+            <i class="bi" [class.bi-pencil-square]="editing.id" [class.bi-plus-circle]="!editing.id"></i>
             {{ editing.id ? 'Edit Project' : 'Create New Project' }}
           </h5>
 
@@ -47,36 +39,73 @@
               />
               @if (projectName.invalid && (projectName.touched || addProject.submitted)) {
                 <div class="text-danger small mt-1">
-                  @if (projectName.errors?.['required']) {
-                    <span>Project title is required</span>
-                  }
-                  @if (projectName.errors?.['minlength']) {
-                    <span>Title must be at least 3 characters</span>
-                  }
+                  @if (projectName.errors?.['required']) { <span>Project title is required</span> }
+                  @if (projectName.errors?.['minlength']) { <span>Title must be at least 3 characters</span> }
                 </div>
               }
             </div>
 
             <div class="col-md-6">
-              <label class="form-label text-white small">Project Image</label>
+              <label class="form-label text-white small">Project Images (You can select multiple)</label>
               <div class="input-group">
                 <input
                   type="file"
                   class="form-control bg-black border-secondary text-white"
-                  (change)="onFileSelected($event)"
+                  (change)="onFilesSelected($event)"
                   accept="image/*"
-                  [required]="!editing.id"
-                  name="projectImage"
-                  [(ngModel)]="editing.projectImage"
-                  #projectImg="ngModel"
+                  multiple
+                  [required]="!editing.id && (!editing.projectImages || editing.projectImages.length === 0)"
+                  name="projectImagesInput"
                 />
               </div>
-              @if (
-                !editing.id && projectImg.invalid && (projectImg.touched || addProject.submitted)
-              ) {
-                <p class="text-danger small mt-1">Project image is required</p>
+              @if (!editing.id && selectedFiles.length === 0 && addProject.submitted) {
+                <p class="text-danger small mt-1">At least one project image is required</p>
               }
             </div>
+
+            <!-- Existing Images with Delete Icon -->
+            @if (editing.id && editing.projectImages && editing.projectImages.length > 0) {
+              <div class="col-12">
+                <label class="form-label text-white small d-block">Current Images</label>
+                <div class="d-flex flex-wrap gap-2">
+                  @for (img of editing.projectImages; track img.publicId; let i = $index) {
+                    <div class="position-relative border border-secondary rounded-3 p-1 bg-black" style="width: 80px; height: 60px;">
+                      <img [src]="img.url" class="w-100 h-100 rounded-2" style="object-fit: cover;" />
+                      <button
+                        type="button"
+                        class="btn btn-danger btn-sm p-0 position-absolute d-flex justify-content-center align-items-center rounded-circle"
+                        style="top: -5px; right: -5px; width: 20px; height: 20px; font-size: 12px;"
+                        (click)="removeExistingImage(i)"
+                      >
+                        <i class="bi bi-x"></i>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Newly Selected Images Preview with Delete Icon -->
+            @if (selectedFiles.length > 0) {
+              <div class="col-12 mt-3">
+                <label class="form-label text-white small">New Images (to be uploaded)</label>
+                <div class="d-flex flex-wrap gap-2">
+                  @for (file of selectedFiles; track $index; let i = $index) {
+                    <div class="position-relative border border-info border-opacity-50 rounded-3 p-1 bg-black" style="width: 80px; height: 60px;">
+                      <img [src]="getPreviewUrl(file)" class="w-100 h-100 rounded-2" style="object-fit: cover;" />
+                      <button
+                        type="button"
+                        class="btn btn-danger btn-sm p-0 position-absolute d-flex justify-content-center align-items-center rounded-circle"
+                        style="top: -5px; right: -5px; width: 20px; height: 20px; font-size: 12px;"
+                        (click)="removeSelectedFile(i)"
+                      >
+                        <i class="bi bi-x"></i>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
 
             <div class="col-12">
               <label class="form-label text-white small">Description</label>
@@ -124,12 +153,8 @@
               />
               @if (gitHub.invalid && (gitHub.touched || addProject.submitted)) {
                 <div class="text-danger small mt-1">
-                  @if (gitHub.errors?.['required']) {
-                    <span>GitHub link is required</span>
-                  }
-                  @if (gitHub.errors?.['pattern']) {
-                    <span>Invalid GitHub URL</span>
-                  }
+                  @if (gitHub.errors?.['required']) { <span>GitHub link is required</span> }
+                  @if (gitHub.errors?.['pattern']) { <span>Invalid GitHub URL</span> }
                 </div>
               }
             </div>
@@ -137,21 +162,17 @@
             <div class="col-12 mt-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <label class="form-label text-info small fw-bold mb-0">Skills</label>
-                <button
-                  type="button"
-                  class="btn btn-outline-info btn-sm rounded-pill"
-                  (click)="addSkill()"
-                >
+                <button type="button" class="btn btn-outline-info btn-sm rounded-pill" (click)="addSkill()">
                   <i class="bi bi-plus-lg me-1"></i> Add
                 </button>
               </div>
               <div class="row g-2">
                 @for (skill of this.editing.usedSkills; track $index; let i = $index) {
-                  <div class="col-2">
+                  <div class="col-md-3 col-sm-6">
                     <div class="input-group">
                       <input
                         type="text"
-                        class="form-control bg-dark border-secondary text-white w-50"
+                        class="form-control bg-dark border-secondary text-white"
                         [(ngModel)]="this.editing.usedSkills[i]"
                         [name]="'skill' + i"
                         placeholder="skill"
@@ -173,16 +194,10 @@
                 (click)="addProject.valid && save()"
                 [disabled]="saving || addProject.invalid"
               >
-                @if (saving) {
-                  <span class="spinner-border spinner-border-sm me-2"></span>
-                }
+                @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
                 {{ editing.id ? 'Update' : 'Save' }} Project
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary rounded-pill px-4"
-                (click)="cancelEdit()"
-              >
+              <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="cancelEdit()">
                 Cancel
               </button>
             </div>
@@ -205,7 +220,7 @@
                 <tr>
                   <td class="border-secondary py-3">
                     <img
-                      [src]="project.projectImage"
+                      [src]="project.projectImages && project.projectImages.length > 0 ? project.projectImages[0].url : 'assets/placeholder.png'"
                       class="rounded-3 border border-secondary"
                       width="60"
                       height="45"
@@ -214,16 +229,10 @@
                   </td>
                   <td class="border-secondary py-3 fw-semibold">{{ project.title }}</td>
                   <td class="border-secondary py-3 text-end">
-                    <button
-                      class="btn btn-outline-warning btn-sm rounded-pill me-2"
-                      (click)="edit(project)"
-                    >
+                    <button class="btn btn-outline-warning btn-sm rounded-pill me-2" (click)="edit(project)">
                       <i class="bi bi-pencil-fill"></i>
                     </button>
-                    <button
-                      class="btn btn-outline-danger btn-sm rounded-pill"
-                      (click)="delete(project.id)"
-                    >
+                    <button class="btn btn-outline-danger btn-sm rounded-pill" (click)="delete(project.id)">
                       <i class="bi bi-trash3-fill"></i>
                     </button>
                   </td>

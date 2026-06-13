@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { forgetPassword, Login, refreshToken, resetPassword, verifyOtp } from "../Controllers/auth.controller.js";
+import { forgetPassword, Login, logout, refreshToken, resetPassword, verifyOtp } from "../Controllers/auth.controller.js";
 import { verifyToken } from "../Middlewares/jwt.middleware.js";
 const router = Router();
 
@@ -12,5 +12,7 @@ router.post("/verfiy-otp", verifyOtp);
 router.post("/reset-password", resetPassword);
 
 router.post("/refresh-token", refreshToken);
+
+router.post("/logout", logout);
 
 export default router;

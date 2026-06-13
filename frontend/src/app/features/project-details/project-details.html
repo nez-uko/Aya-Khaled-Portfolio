@@ -2,9 +2,25 @@
   <div class="container py-5">
     <div class="row g-5 align-items-center">
       <div class="col-lg-6">
-        <div class="detail-img-wrapper rounded-4 overflow-hidden border border-secondary shadow-lg">
-          <img [src]="project?.projectImage"  [alt]="project?.title" class="img-fluid w-100">
+        <div class="detail-img-wrapper rounded-4 overflow-hidden border border-secondary shadow-lg mb-3">
+          <img [src]="activeImageUrl || (project?.projectImages && project!.projectImages.length > 0 ? project!.projectImages[0].url : 'assets/placeholder.png')"  [alt]="project?.title" class="img-fluid w-100">
         </div>
+
+        @if (project?.projectImages && project!.projectImages.length > 1) {
+          <div class="d-flex flex-wrap gap-2 justify-content-center">
+            @for (img of project?.projectImages; track img.publicId) {
+              <div
+                class="thumbnail-wrapper rounded-3 overflow-hidden border cursor-pointer"
+                [class.border-info]="activeImageUrl === img.url || (!activeImageUrl && project?.projectImages?.[0]?.url === img.url)"
+                [class.border-secondary]="activeImageUrl !== img.url && (activeImageUrl || project?.projectImages?.[0]?.url !== img.url)"
+                style="width: 70px; height: 50px;"
+                (click)="setActiveImage(img.url)"
+              >
+                <img [src]="img.url" class="w-100 h-100" style="object-fit: cover;">
+              </div>
+            }
+          </div>
+        }
       </div>
 
       <div class="col-lg-6">
@@ -25,12 +41,13 @@
         </div>
 
         <div class="project-tags d-flex flex-wrap gap-2 mb-4">
-                    @for (skill of project?.usedSkills; track $index) {
-                      <span class="skill-tag">
-                          {{skill}}
-                    </span>
-                    }
+          @for (skill of project?.usedSkills; track $index) {
+            <span class="skill-tag">
+              {{skill}}
+            </span>
+          }
         </div>
+
         <div class="project-actions d-flex gap-3">
           <a [href]="project?.githubLink" target="_blank" class="btn btn-dark border-secondary rounded-pill px-4 py-2">
             <i class="bi bi-github me-2"></i>Source Code
