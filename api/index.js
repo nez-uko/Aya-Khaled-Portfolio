@@ -1,5 +1,5 @@
 import express, { json } from "express";
-import cors  from "cors"
+import cors from "cors"
 import { configDotenv } from "dotenv";
 import path from "path";
 import cookieParser from "cookie-parser";
@@ -12,14 +12,24 @@ import { sequelize } from "../backend/Config/db.config.js";
 
 configDotenv();
 const app = express();
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        const cleanedOrigin = origin.replace(/\/$/, '');
+        if (cleanedOrigin === 'https://aya-khaled-portfolio-rcmc.vercel.app') {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+};
 
 // Middlewares
 app.use(json());
 app.use(cookieParser());
-app.use(cors({
-    origin: 'https://aya-khaled-portfolio-rcmc.vercel.app/',
-    credentials: true
-}));
+
+app.use(cors(corsOptions));
 
 try {
     await sequelize.authenticate();
