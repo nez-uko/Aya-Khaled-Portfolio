@@ -61,7 +61,6 @@ async save() {
     try {
       this.experiences = await this.api.getExperiences();
     } catch (error) {
-      console.error('Error loading experiences:', error);
     } finally {
       this.loading = false;
     }

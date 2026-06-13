@@ -82,7 +82,6 @@ export class HomeComponent implements OnInit {
         this.errorMessage = 'Failed to load data. Please refresh the page.';
       }
     } catch (error) {
-      console.error('Error loading data:', error);
       this.loadingError = true;
       this.errorMessage = 'Failed to load data. Please check your connection.';
     } finally {

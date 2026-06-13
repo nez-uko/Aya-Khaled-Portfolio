@@ -34,7 +34,7 @@ export class ProjectDetailsComponent implements OnInit {
         this.activeImageUrl = this.project.projectImages[0].url;
       }
     } catch (error) {
-      console.error('Error loading project:', error);
+
     } finally {
       this.loading = false;
     }

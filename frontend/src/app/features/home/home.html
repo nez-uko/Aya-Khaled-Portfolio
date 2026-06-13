@@ -56,14 +56,13 @@
           <div
             class="d-flex gap-3 justify-content-center flex-row flex-lg-row justify-content-lg-start"
           >
-            <a
+            <a target="_blank"
               routerLink="/projects"
               class="btn btn-primary btn-lg px-4 fw-bold text-dark"
               >View Projects</a
             >
-            <a
+            <a target="_blank"
               [href]="user?.cv"
-              target="_blank"
               class="btn btn-outline-light btn-lg px-4"
               >Download CV</a
             >
@@ -164,8 +163,8 @@
           }
         </div>
         <div class="d-flex gap-2">
-          <a [href]="project?.liveDemo" target="_blank" class="btn btn-sm btn-info fw-bold">Live Demo</a>
-          <a [href]="project?.githubLink" target="_blank" class="btn btn-sm btn-2 fw-bold">Code</a>
+          <a target="_blank" [href]="project?.liveDemo" target="_blank" class="btn btn-sm btn-info fw-bold">Live Demo</a>
+          <a target="_blank" [href]="project?.githubLink" target="_blank" class="btn btn-sm btn-2 fw-bold">Code</a>
         </div>
       </div>
     </div>
@@ -176,7 +175,7 @@
       <div
         class="d-flex justify-content-center align-items-center py-2 px-2 my-5"
       >
-        <a href="/projects" class="btn btn-outline-info btn-lg"
+        <a target="_blank" href="/projects" class="btn btn-outline-info btn-lg"
           >View All Projects</a
         >
       </div>
@@ -276,7 +275,7 @@
               <span class="badge date-badge px-3 py-2"
                 >{{ cert.issueDate | date: 'MMM yyyy' }}</span
               >
-              <a
+              <a target="_blank"
                 [href]="cert.certificateImage.url"
                 target="_blank"
                 class="btn btn-sm btn-outline-info rounded-pill px-3"
@@ -314,7 +313,7 @@
             <div class="d-flex align-items-center mb-4">
               <div class="icon-box me-3"><i class="bi bi-envelope-at"></i></div>
               <div>
-                <a
+                <a target="_blank"
                   [href]="'mailto:' + user?.email"
                   class="text-decoration-none"
                 >
@@ -326,7 +325,7 @@
             <div class="d-flex align-items-center mb-4">
               <div class="icon-box me-3"><i class="bi bi-phone"></i></div>
               <div>
-                <a
+                <a target="_blank"
                   [href]="'tel:' + user?.phoneNumber"
                   class="text-decoration-none"
                 >
@@ -352,13 +351,13 @@
                 Professional Profiles
               </p>
               <div class="d-flex flex-wrap gap-2">
-                <a
+                <a target="_blank"
                   [href]="user?.linkedIn"
                   class="icon-box text-decoration-none"
                   title="LinkedIn"
                   ><i class="bi bi-linkedin"></i
                 ></a>
-                <a
+                <a target="_blank"
                   [href]="user?.gitHub"
                   class="icon-box text-decoration-none"
                   title="GitHub"
@@ -368,7 +367,7 @@
                 <div class="d-flex flex-wrap gap-2">
                   @for (platform of getAvailablePlatforms(); track
                   platform.name) {
-                  <a
+                  <a target="_blank"
                     [href]="platform.url"
                     class="icon-box text-decoration-none"
                     [title]="platform.name"
