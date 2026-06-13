@@ -16,7 +16,7 @@ import { User } from '../../interfaces/portfolio-interface';
 export class NavbarComponent implements OnInit{
   isMenuOpen = false;
   user?:User;
-  constructor(private ApiService:ApiService){
+  constructor(public ApiService:ApiService){
 
   }
   async ngOnInit() {
