@@ -161,7 +161,10 @@ const getAllCertificatesService = async (req) => {
     if (certificates) {
         certificates.forEach(cert => {
             if (cert.certificateImage && cert.certificateImage.url) {
-                cert.certificateImage = cert.certificateImage.url;
+                if (!cert.certificateImage.url.startsWith('http')) {
+                    const baseUrl = `${req.protocol}://${req.get('host')}`;
+                    cert.certificateImage.url = `${baseUrl}${cert.certificateImage.url}`;
+                }
             }
         });
     }
